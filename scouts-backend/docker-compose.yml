@@ -1,0 +1,50 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: scouts-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: scouts_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d scouts_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scouts-network
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scouts-api
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://admin:admin123@db:5432/scouts_db
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+    networks:
+      - scouts-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  scouts-network:
+    driver: bridge

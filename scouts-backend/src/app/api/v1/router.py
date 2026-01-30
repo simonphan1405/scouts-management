@@ -5,9 +5,16 @@ Combines all v1 endpoint routers.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import health, users
+from app.api.v1.endpoints import auth, health, users
 
 api_router = APIRouter()
+
+# Include authentication routes
+api_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Authentication"]
+)
 
 # Include health check routes
 api_router.include_router(
@@ -22,3 +29,4 @@ api_router.include_router(
     prefix="/users",
     tags=["Users"]
 )
+

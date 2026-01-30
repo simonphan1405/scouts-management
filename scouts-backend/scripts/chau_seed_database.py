@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import AsyncSessionLocal
 from app.models.chau import Chau
-from app.db.seeds.seed_data import CHAU_SEED_DATA
+from app.db.seeds.chau_seed_data import CHAU_SEED_DATA
 
 
 async def seed_chau_table(db: AsyncSession) -> None:

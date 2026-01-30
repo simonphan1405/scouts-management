@@ -99,6 +99,91 @@ src/app/
    docker-compose down
    ```
 
+## Database Migrations
+
+This project uses **Alembic** for database schema management. All schema changes should be managed through migrations.
+
+### Initial Setup
+
+When setting up the project for the first time, run migrations to create the database schema:
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate
+
+# Apply all migrations
+alembic upgrade head
+```
+
+### Creating New Migrations
+
+When you modify database models (in `src/app/models/`), create a new migration:
+
+```bash
+# Auto-generate migration from model changes
+alembic revision --autogenerate -m "Description of changes"
+
+# Example:
+# alembic revision --autogenerate -m "Add profile table"
+```
+
+**Important**: Always review the generated migration file in `alembic/versions/` before applying it.
+
+### Applying Migrations
+
+```bash
+# Upgrade to the latest version
+alembic upgrade head
+
+# Upgrade to a specific version
+alembic upgrade <revision_id>
+
+# Upgrade by one version
+alembic upgrade +1
+```
+
+### Rolling Back Migrations
+
+```bash
+# Downgrade by one version
+alembic downgrade -1
+
+# Downgrade to a specific version
+alembic downgrade <revision_id>
+
+# Downgrade all the way
+alembic downgrade base
+```
+
+### Checking Migration Status
+
+```bash
+# Show current migration version
+alembic current
+
+# Show migration history
+alembic history
+
+# Show pending migrations
+alembic history --verbose
+```
+
+### Migration Workflow
+
+1. **Modify your models** in `src/app/models/`
+2. **Import the model** in `src/app/db/base.py` so Alembic can detect it
+3. **Generate migration**: `alembic revision --autogenerate -m "description"`
+4. **Review the migration** file in `alembic/versions/`
+5. **Apply the migration**: `alembic upgrade head`
+6. **Test your changes** with the application
+
+### Important Notes
+
+- Always run migrations before starting the application
+- Never use `Base.metadata.create_all()` in production
+- Commit migration files to version control
+- Test migrations in development before applying to production
+
 ## API Documentation
 
 Once the server is running, you can access:

@@ -32,6 +32,6 @@ class TimestampMixin:
         nullable=False
     )
 
-
 # Import all models here so Alembic can discover them
-# from app.models.user import User  # Example
+# NOTE: Do not import models here - it causes circular imports!
+# Models are imported in alembic/env.py instead for migration discovery

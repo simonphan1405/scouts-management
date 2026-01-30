@@ -33,10 +33,16 @@ compose-up-migrate:
 	@cd scouts-backend && docker compose exec api alembic upgrade head
 	@echo "✅ Application started and migrations completed!"
 
-# Seed the database with initial data
+# Seed the database with initial data (runs all seed scripts)
 seed:
 	@echo "Seeding the database..."
-	@cd scouts-backend && docker compose exec api python -m scripts.seed_database
+	@cd scouts-backend && for script in scripts/*_seed_database.py; do \
+		if [ -f "$$script" ]; then \
+			echo "Running $$script..."; \
+			docker compose exec api python -m $$(echo $$script | sed 's/\.py$$//' | sed 's/\//./'g); \
+		fi \
+	done
+	@echo "✅ All seed scripts completed!"
 
 # View API logs
 logs:

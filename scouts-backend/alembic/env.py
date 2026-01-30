@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 # Import the Base and all models so Alembic can detect them
 from app.db.base import Base
 from app.models.user import User  # noqa: F401
+from app.models.chau import Chau  # noqa: F401
 
 # Import settings to get the database URL
 from app.config import settings

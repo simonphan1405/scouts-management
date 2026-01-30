@@ -40,23 +40,19 @@ async_session_maker = async_sessionmaker(
 async def init_db() -> None:
     """
     Initialize database.
-    Creates all tables defined in models.
     
-    Note: In production, use Alembic for migrations instead.
+    DEPRECATED: This function is deprecated in favor of Alembic migrations.
+    Use 'alembic upgrade head' to create/update database schema instead.
+    
+    This function is kept for backward compatibility but does nothing.
+    In production, always use Alembic for database migrations.
     """
-    try:
-        from app.db.base import Base
-        
-        logger.info("Initializing database...")
-        
-        async with async_engine.begin() as conn:
-            # In production, comment this out and use Alembic
-            await conn.run_sync(Base.metadata.create_all)
-        
-        logger.info("Database initialized successfully")
-    except Exception as e:
-        logger.error(f"Error initializing database: {e}")
-        raise
+    logger.warning(
+        "init_db() is deprecated. Please use Alembic migrations instead. "
+        "Run 'alembic upgrade head' to apply database migrations."
+    )
+    # The create_all() call has been removed. Use Alembic migrations.
+    pass
 
 
 async def close_db() -> None:

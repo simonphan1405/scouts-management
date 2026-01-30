@@ -39,12 +39,20 @@ async def lifespan(app: FastAPI):
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"Debug mode: {settings.DEBUG}")
     
-    # Initialize database
+    # Check database connection
+    # Note: Database schema should be managed using Alembic migrations
+    # Run 'alembic upgrade head' before starting the application
     try:
-        await init_db()
+        from app.db.session import check_db_connection
+        
+        if await check_db_connection():
+            logger.info("Database connection established")
+        else:
+            logger.warning("Database connection check failed")
+            if settings.is_production:
+                raise Exception("Cannot start application without database connection")
     except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
-        # In production, you might want to fail startup if DB is unavailable
+        logger.error(f"Database connection error: {e}")
         if settings.is_production:
             raise
     

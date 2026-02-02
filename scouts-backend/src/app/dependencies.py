@@ -9,8 +9,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import async_session_maker
-from app.models.user import User
-from app.services.auth import AuthService
+from app.models.user_model import User
+from app.services.auth_service import AuthService
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

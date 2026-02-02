@@ -8,9 +8,9 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequestException, NotFoundException
-from app.models.chau import Chau
-from app.repositories.chau import ChauRepository
-from app.schemas.chau import ChauCreate, ChauUpdate
+from app.models.chau_model import Chau
+from app.repositories.chau_repository import ChauRepository
+from app.schemas.chau_schema import ChauCreate, ChauUpdate
 
 
 class ChauService:

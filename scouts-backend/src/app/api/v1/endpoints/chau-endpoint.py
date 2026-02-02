@@ -9,9 +9,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import get_db, CommonQueryParams
-from app.schemas.base import MessageResponse
-from app.schemas.chau import Chau, ChauCreate, ChauUpdate, ChauList
-from app.services.chau import ChauService
+from app.schemas.base_schema import MessageResponse
+from app.schemas.chau_schema import Chau, ChauCreate, ChauUpdate, ChauList
+from app.services.chau_service import ChauService
 
 router = APIRouter()
 

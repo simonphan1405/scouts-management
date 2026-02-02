@@ -12,9 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.core.exceptions import UnauthorizedException, NotFoundException
 from app.core.security import create_access_token, create_refresh_token, decode_token
-from app.models.user import User
-from app.repositories.user import UserRepository
-from app.services.user import UserService
+from app.models.user_model import User
+from app.repositories.user_repository import UserRepository
+from app.services.user_service import UserService
 
 
 class AuthService:

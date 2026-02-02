@@ -10,9 +10,9 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequestException, NotFoundException
-from app.models.user import User
-from app.repositories.user import UserRepository
-from app.schemas.user import UserCreate, UserUpdate
+from app.models.user_model import User
+from app.repositories.user_repository import UserRepository
+from app.schemas.user_schema import UserCreate, UserUpdate
 
 
 class UserService:

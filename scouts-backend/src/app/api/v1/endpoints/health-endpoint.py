@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import check_db_connection
 from app.dependencies import get_db
-from app.schemas.base import HealthResponse
+from app.schemas.base_schema import HealthResponse
 
 router = APIRouter()
 

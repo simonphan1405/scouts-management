@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from app.db.base import Base
 from app.models.user import User  # noqa: F401
 from app.models.chau import Chau  # noqa: F401
+from app.models.dao import Dao  # noqa: F401
 
 # Import settings to get the database URL
 from app.config import settings

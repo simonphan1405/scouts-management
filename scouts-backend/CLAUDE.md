@@ -152,6 +152,47 @@ Follow this workflow strictly to maintain architecture:
    )
    ```
 
+## Endpoint Protection Rules
+
+**All new module endpoints MUST include authentication protection.** Never create unprotected CRUD endpoints.
+
+### Protection Scheme
+
+| Operation | Dependency | Rationale |
+|-----------|------------|-----------|
+| GET (list/detail) | `get_current_active_user` | Only active authenticated users can read data |
+| POST (create) | `get_current_active_user` | Only active authenticated users can create resources |
+| PUT (update) | `get_current_active_user` | Only active authenticated users can update resources |
+| DELETE | `get_current_superuser` | Only superusers can delete resources |
+
+### Exceptions (intentionally public)
+- `POST /auth/login` and `POST /auth/refresh` — must be public for authentication
+- `GET /health/*` — must be public for monitoring
+
+### Example Protected Endpoint
+
+```python
+from app.dependencies import get_db, get_current_active_user, get_current_superuser
+from app.models.user import User
+
+@router.get("/my-resource")
+async def list_items(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    service = MyModelService(db)
+    return await service.get_all()
+
+@router.delete("/my-resource/{id}", status_code=204)
+async def delete_item(
+    id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_superuser),
+):
+    service = MyModelService(db)
+    await service.delete(id)
+```
+
 ## Important Notes
 
 ### Alembic Migration Discovery

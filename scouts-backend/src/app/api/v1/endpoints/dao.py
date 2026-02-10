@@ -8,7 +8,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, CommonQueryParams
+from app.dependencies import get_db, CommonQueryParams, get_current_active_user, get_current_superuser
+from app.models.user import User as UserModel
 from app.schemas.base import MessageResponse
 from app.schemas.dao import Dao, DaoCreate, DaoUpdate, DaoList
 from app.services.dao import DaoService
@@ -26,7 +27,8 @@ router = APIRouter()
 async def get_dao_list(
     commons: CommonQueryParams = Depends(),
     chau_id: Optional[int] = Query(None, description="Filter by chau ID"),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> DaoList:
     """Get all dao with pagination, optionally filtered by chau_id."""
     service = DaoService(db)
@@ -48,7 +50,8 @@ async def get_dao_list(
 )
 async def get_dao(
     dao_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> Dao:
     """Get a dao by ID."""
     service = DaoService(db)
@@ -64,7 +67,8 @@ async def get_dao(
 )
 async def create_dao(
     dao_data: DaoCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> Dao:
     """Create a new dao."""
     service = DaoService(db)
@@ -81,7 +85,8 @@ async def create_dao(
 async def update_dao(
     dao_id: int,
     dao_data: DaoUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> Dao:
     """Update a dao."""
     service = DaoService(db)
@@ -97,7 +102,8 @@ async def update_dao(
 )
 async def delete_dao(
     dao_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_superuser),
 ) -> MessageResponse:
     """Delete a dao."""
     service = DaoService(db)

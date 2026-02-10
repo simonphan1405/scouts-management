@@ -21,6 +21,7 @@ from app.core.middleware import (
     TimingMiddleware,
     SecurityHeadersMiddleware
 )
+from app.core.init_data import create_default_superuser
 from app.db.session import init_db, close_db
 
 # Setup logging
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
         
         if await check_db_connection():
             logger.info("Database connection established")
+            await create_default_superuser()
         else:
             logger.warning("Database connection check failed")
             if settings.is_production:

@@ -25,13 +25,16 @@ migrate:
 
 # Start services and run migrations in one command
 compose-up-migrate:
-	@echo "Starting application and running migrations..."
-	@cd scouts-backend && docker compose up -d --build
-	@echo "Waiting for services to be ready..."
-	@sleep 7
-	@echo "Running migrations..."
-	@cd scouts-backend && docker compose exec api alembic upgrade head
-	@echo "✅ Application started and migrations completed!"
+	@echo "Starting database..."
+	@cd scouts-backend && docker compose up -d --build db
+	@echo "Waiting for database to be ready..."
+	@cd scouts-backend && until docker compose exec db pg_isready -U admin -d scouts_db > /dev/null 2>&1; do sleep 1; done
+	@echo "Building and running migrations..."
+	@cd scouts-backend && docker compose build api
+	@cd scouts-backend && docker compose run --rm api alembic upgrade head
+	@echo "Starting application..."
+	@cd scouts-backend && docker compose up -d api
+	@echo "✅ Migrations completed and application started!"
 
 # Seed the database with initial data (runs all seed scripts)
 seed:

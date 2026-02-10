@@ -5,7 +5,7 @@ Combines all v1 endpoint routers.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, health, users, chau
+from app.api.v1.endpoints import auth, health, users, chau, dao
 
 api_router = APIRouter()
 
@@ -35,5 +35,12 @@ api_router.include_router(
     chau.router,
     prefix="/chau",
     tags=["Chau"]
+)
+
+# Include dao routes
+api_router.include_router(
+    dao.router,
+    prefix="/dao",
+    tags=["Dao"]
 )
 

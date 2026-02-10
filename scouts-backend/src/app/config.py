@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
+    # Default Superuser (created on first startup)
+    DEFAULT_SUPERUSER_EMAIL: str = "admin@scouts.com"
+    DEFAULT_SUPERUSER_USERNAME: str = "admin"
+    DEFAULT_SUPERUSER_PASSWORD: str = "changeme123"
+    DEFAULT_SUPERUSER_FULL_NAME: str = "Default Admin"
+
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"

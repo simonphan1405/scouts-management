@@ -8,7 +8,8 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, CommonQueryParams
+from app.dependencies import get_db, CommonQueryParams, get_current_active_user, get_current_superuser
+from app.models.user import User as UserModel
 from app.schemas.base import MessageResponse
 from app.schemas.chau import Chau, ChauCreate, ChauUpdate, ChauList
 from app.services.chau import ChauService
@@ -25,7 +26,8 @@ router = APIRouter()
 )
 async def get_chau_list(
     commons: CommonQueryParams = Depends(),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> ChauList:
     """Get all chau with pagination."""
     service = ChauService(db)
@@ -43,7 +45,8 @@ async def get_chau_list(
 )
 async def get_chau(
     chau_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> Chau:
     """Get a chau by ID."""
     service = ChauService(db)
@@ -59,7 +62,8 @@ async def get_chau(
 )
 async def create_chau(
     chau_data: ChauCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> Chau:
     """Create a new chau."""
     service = ChauService(db)
@@ -76,7 +80,8 @@ async def create_chau(
 async def update_chau(
     chau_id: int,
     chau_data: ChauUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> Chau:
     """Update a chau."""
     service = ChauService(db)
@@ -92,7 +97,8 @@ async def update_chau(
 )
 async def delete_chau(
     chau_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_superuser),
 ) -> MessageResponse:
     """Delete a chau."""
     service = ChauService(db)

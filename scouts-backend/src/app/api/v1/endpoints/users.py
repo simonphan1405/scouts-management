@@ -8,7 +8,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import get_db, CommonQueryParams, get_current_user, get_current_superuser
+from app.dependencies import get_db, CommonQueryParams, get_current_active_user, get_current_superuser
 from app.models.user import User as UserModel
 from app.schemas.base import MessageResponse
 from app.schemas.user import User, UserCreate, UserUpdate, UserList
@@ -26,7 +26,8 @@ router = APIRouter()
 )
 async def get_users(
     commons: CommonQueryParams = Depends(),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> UserList:
     """Get all users with pagination."""
     service = UserService(db)
@@ -44,7 +45,8 @@ async def get_users(
 )
 async def get_user(
     user_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> User:
     """Get a user by ID."""
     service = UserService(db)
@@ -60,7 +62,8 @@ async def get_user(
 )
 async def create_user(
     user_data: UserCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> User:
     """Create a new user."""
     service = UserService(db)
@@ -77,7 +80,8 @@ async def create_user(
 async def update_user(
     user_id: int,
     user_data: UserUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
 ) -> User:
     """Update a user."""
     service = UserService(db)
@@ -93,7 +97,8 @@ async def update_user(
 )
 async def delete_user(
     user_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_superuser),
 ) -> MessageResponse:
     """Delete a user."""
     service = UserService(db)

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import BadRequestException, NotFoundException
 from app.models.chau import Chau
 from app.repositories.chau import ChauRepository
-from app.schemas.chau import ChauCreate, ChauUpdate
+from app.schemas.chau import ChauCreate, ChauSearch, ChauUpdate
 
 
 class ChauService:
@@ -53,6 +53,34 @@ class ChauService:
         total = await self.repository.count()
         return chau_list, total
     
+    async def search_chau(
+        self, search_params: ChauSearch, skip: int = 0, limit: int = 100
+    ) -> tuple[List[Chau], int]:
+        """
+        Search chau with optional filters.
+
+        Args:
+            search_params: Search filter parameters
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+
+        Returns:
+            Tuple of (list of matching chau, total count)
+        """
+        chau_list = await self.repository.search(
+            ten_chau=search_params.ten_chau,
+            dia_chi=search_params.dia_chi,
+            mo_ta=search_params.mo_ta,
+            skip=skip,
+            limit=limit,
+        )
+        total = await self.repository.search_count(
+            ten_chau=search_params.ten_chau,
+            dia_chi=search_params.dia_chi,
+            mo_ta=search_params.mo_ta,
+        )
+        return chau_list, total
+
     async def create_chau(self, chau_data: ChauCreate) -> Chau:
         """
         Create a new chau.

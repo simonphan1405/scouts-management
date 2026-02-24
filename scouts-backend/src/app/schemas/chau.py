@@ -49,10 +49,18 @@ class Chau(ChauBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ChauSearch(BaseModel):
+    """Schema for searching chau."""
+
+    ten_chau: Optional[str] = Field(None, description="Tìm kiếm theo tên châu")
+    dia_chi: Optional[str] = Field(None, description="Tìm kiếm theo địa chỉ")
+    mo_ta: Optional[str] = Field(None, description="Tìm kiếm theo mô tả")
+
+
 class ChauList(BaseModel):
     """Schema for list of chau."""
-    
+
     chau: list[Chau]
     total: int
-    
+
     model_config = ConfigDict(from_attributes=True)

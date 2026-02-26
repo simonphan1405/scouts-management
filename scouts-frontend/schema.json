@@ -1,0 +1,1649 @@
+{
+  "data": {
+    "__schema": {
+      "types": [
+        {
+          "name": "BigFloat",
+          "fields": null
+        },
+        {
+          "name": "BigFloatFilter",
+          "fields": null
+        },
+        {
+          "name": "BigFloatListFilter",
+          "fields": null
+        },
+        {
+          "name": "BigInt",
+          "fields": null
+        },
+        {
+          "name": "BigIntFilter",
+          "fields": null
+        },
+        {
+          "name": "BigIntListFilter",
+          "fields": null
+        },
+        {
+          "name": "Boolean",
+          "fields": null
+        },
+        {
+          "name": "BooleanFilter",
+          "fields": null
+        },
+        {
+          "name": "BooleanListFilter",
+          "fields": null
+        },
+        {
+          "name": "Councils",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "address"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "founded_date"
+            },
+            {
+              "name": "membersCollection"
+            },
+            {
+              "name": "groupsCollection"
+            },
+            {
+              "name": "districtsCollection"
+            }
+          ]
+        },
+        {
+          "name": "CouncilsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "CouncilsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "CouncilsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "CouncilsFilter",
+          "fields": null
+        },
+        {
+          "name": "CouncilsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "CouncilsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "CouncilsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "CouncilsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "CouncilsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "Cursor",
+          "fields": null
+        },
+        {
+          "name": "Date",
+          "fields": null
+        },
+        {
+          "name": "DateFilter",
+          "fields": null
+        },
+        {
+          "name": "DateListFilter",
+          "fields": null
+        },
+        {
+          "name": "Datetime",
+          "fields": null
+        },
+        {
+          "name": "DatetimeFilter",
+          "fields": null
+        },
+        {
+          "name": "DatetimeListFilter",
+          "fields": null
+        },
+        {
+          "name": "Districts",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "address"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "council"
+            },
+            {
+              "name": "founded_date"
+            },
+            {
+              "name": "councils"
+            },
+            {
+              "name": "membersCollection"
+            },
+            {
+              "name": "groupsCollection"
+            }
+          ]
+        },
+        {
+          "name": "DistrictsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "DistrictsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "DistrictsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "DistrictsFilter",
+          "fields": null
+        },
+        {
+          "name": "DistrictsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "DistrictsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "DistrictsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "DistrictsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "DistrictsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "Expenses",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "member_id"
+            },
+            {
+              "name": "amount"
+            },
+            {
+              "name": "purpose"
+            },
+            {
+              "name": "payment_date"
+            },
+            {
+              "name": "notes"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "status"
+            }
+          ]
+        },
+        {
+          "name": "ExpensesConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "ExpensesDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "ExpensesEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "ExpensesFilter",
+          "fields": null
+        },
+        {
+          "name": "ExpensesInsertInput",
+          "fields": null
+        },
+        {
+          "name": "ExpensesInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "ExpensesOrderBy",
+          "fields": null
+        },
+        {
+          "name": "ExpensesUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "ExpensesUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "FilterIs",
+          "fields": null
+        },
+        {
+          "name": "Float",
+          "fields": null
+        },
+        {
+          "name": "FloatFilter",
+          "fields": null
+        },
+        {
+          "name": "FloatListFilter",
+          "fields": null
+        },
+        {
+          "name": "Groups",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "address"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "district"
+            },
+            {
+              "name": "founded_date"
+            },
+            {
+              "name": "council"
+            },
+            {
+              "name": "districts"
+            },
+            {
+              "name": "councils"
+            },
+            {
+              "name": "membersCollection"
+            },
+            {
+              "name": "troopsCollection"
+            }
+          ]
+        },
+        {
+          "name": "GroupsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "GroupsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "GroupsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "GroupsFilter",
+          "fields": null
+        },
+        {
+          "name": "GroupsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "GroupsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "GroupsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "GroupsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "GroupsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "ID",
+          "fields": null
+        },
+        {
+          "name": "IDFilter",
+          "fields": null
+        },
+        {
+          "name": "Int",
+          "fields": null
+        },
+        {
+          "name": "IntFilter",
+          "fields": null
+        },
+        {
+          "name": "IntListFilter",
+          "fields": null
+        },
+        {
+          "name": "JSON",
+          "fields": null
+        },
+        {
+          "name": "Members",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "full_name"
+            },
+            {
+              "name": "gender"
+            },
+            {
+              "name": "date_of_birth"
+            },
+            {
+              "name": "identification_number"
+            },
+            {
+              "name": "religion"
+            },
+            {
+              "name": "join_year"
+            },
+            {
+              "name": "promise_year"
+            },
+            {
+              "name": "current_section"
+            },
+            {
+              "name": "previous_sections"
+            },
+            {
+              "name": "council"
+            },
+            {
+              "name": "district"
+            },
+            {
+              "name": "group"
+            },
+            {
+              "name": "troop"
+            },
+            {
+              "name": "unit"
+            },
+            {
+              "name": "ranking"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "role"
+            },
+            {
+              "name": "religions"
+            },
+            {
+              "name": "councils"
+            },
+            {
+              "name": "districts"
+            },
+            {
+              "name": "groups"
+            },
+            {
+              "name": "rankings"
+            },
+            {
+              "name": "units"
+            },
+            {
+              "name": "troops"
+            },
+            {
+              "name": "sections"
+            }
+          ]
+        },
+        {
+          "name": "MembersConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "MembersDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "MembersEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "MembersFilter",
+          "fields": null
+        },
+        {
+          "name": "MembersInsertInput",
+          "fields": null
+        },
+        {
+          "name": "MembersInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "MembersOrderBy",
+          "fields": null
+        },
+        {
+          "name": "MembersUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "MembersUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "Mutation",
+          "fields": [
+            {
+              "name": "deleteFromCouncilsCollection"
+            },
+            {
+              "name": "deleteFromDistrictsCollection"
+            },
+            {
+              "name": "deleteFromExpensesCollection"
+            },
+            {
+              "name": "deleteFromGroupsCollection"
+            },
+            {
+              "name": "deleteFromMembersCollection"
+            },
+            {
+              "name": "deleteFromRankingsCollection"
+            },
+            {
+              "name": "deleteFromReligionsCollection"
+            },
+            {
+              "name": "deleteFromSectionsCollection"
+            },
+            {
+              "name": "deleteFromTroopsCollection"
+            },
+            {
+              "name": "deleteFromUnitsCollection"
+            },
+            {
+              "name": "insertIntoCouncilsCollection"
+            },
+            {
+              "name": "insertIntoDistrictsCollection"
+            },
+            {
+              "name": "insertIntoExpensesCollection"
+            },
+            {
+              "name": "insertIntoGroupsCollection"
+            },
+            {
+              "name": "insertIntoMembersCollection"
+            },
+            {
+              "name": "insertIntoRankingsCollection"
+            },
+            {
+              "name": "insertIntoReligionsCollection"
+            },
+            {
+              "name": "insertIntoSectionsCollection"
+            },
+            {
+              "name": "insertIntoTroopsCollection"
+            },
+            {
+              "name": "insertIntoUnitsCollection"
+            },
+            {
+              "name": "updateCouncilsCollection"
+            },
+            {
+              "name": "updateDistrictsCollection"
+            },
+            {
+              "name": "updateExpensesCollection"
+            },
+            {
+              "name": "updateGroupsCollection"
+            },
+            {
+              "name": "updateMembersCollection"
+            },
+            {
+              "name": "updateRankingsCollection"
+            },
+            {
+              "name": "updateReligionsCollection"
+            },
+            {
+              "name": "updateSectionsCollection"
+            },
+            {
+              "name": "updateTroopsCollection"
+            },
+            {
+              "name": "updateUnitsCollection"
+            }
+          ]
+        },
+        {
+          "name": "Node",
+          "fields": [
+            {
+              "name": "nodeId"
+            }
+          ]
+        },
+        {
+          "name": "Opaque",
+          "fields": null
+        },
+        {
+          "name": "OpaqueFilter",
+          "fields": null
+        },
+        {
+          "name": "OrderByDirection",
+          "fields": null
+        },
+        {
+          "name": "PageInfo",
+          "fields": [
+            {
+              "name": "endCursor"
+            },
+            {
+              "name": "hasNextPage"
+            },
+            {
+              "name": "hasPreviousPage"
+            },
+            {
+              "name": "startCursor"
+            }
+          ]
+        },
+        {
+          "name": "Query",
+          "fields": [
+            {
+              "name": "councilsCollection"
+            },
+            {
+              "name": "districtsCollection"
+            },
+            {
+              "name": "expensesCollection"
+            },
+            {
+              "name": "groupsCollection"
+            },
+            {
+              "name": "membersCollection"
+            },
+            {
+              "name": "node"
+            },
+            {
+              "name": "rankingsCollection"
+            },
+            {
+              "name": "religionsCollection"
+            },
+            {
+              "name": "sectionsCollection"
+            },
+            {
+              "name": "troopsCollection"
+            },
+            {
+              "name": "unitsCollection"
+            }
+          ]
+        },
+        {
+          "name": "Rankings",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "level"
+            },
+            {
+              "name": "requirement"
+            },
+            {
+              "name": "section"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "sections"
+            },
+            {
+              "name": "membersCollection"
+            }
+          ]
+        },
+        {
+          "name": "RankingsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "RankingsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "RankingsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "RankingsFilter",
+          "fields": null
+        },
+        {
+          "name": "RankingsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "RankingsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "RankingsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "RankingsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "RankingsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "Religions",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "code"
+            },
+            {
+              "name": "membersCollection"
+            }
+          ]
+        },
+        {
+          "name": "ReligionsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "ReligionsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "ReligionsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "ReligionsFilter",
+          "fields": null
+        },
+        {
+          "name": "ReligionsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "ReligionsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "ReligionsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "ReligionsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "ReligionsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "Sections",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "min_age"
+            },
+            {
+              "name": "max_age"
+            },
+            {
+              "name": "motto"
+            },
+            {
+              "name": "troopsCollection"
+            },
+            {
+              "name": "rankingsCollection"
+            },
+            {
+              "name": "membersCollection"
+            }
+          ]
+        },
+        {
+          "name": "SectionsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "SectionsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "SectionsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "SectionsFilter",
+          "fields": null
+        },
+        {
+          "name": "SectionsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "SectionsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "SectionsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "SectionsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "SectionsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "String",
+          "fields": null
+        },
+        {
+          "name": "StringFilter",
+          "fields": null
+        },
+        {
+          "name": "StringListFilter",
+          "fields": null
+        },
+        {
+          "name": "Time",
+          "fields": null
+        },
+        {
+          "name": "TimeFilter",
+          "fields": null
+        },
+        {
+          "name": "TimeListFilter",
+          "fields": null
+        },
+        {
+          "name": "Troops",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "address"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "group"
+            },
+            {
+              "name": "section"
+            },
+            {
+              "name": "founded_date"
+            },
+            {
+              "name": "sections"
+            },
+            {
+              "name": "groups"
+            },
+            {
+              "name": "unitsCollection"
+            },
+            {
+              "name": "membersCollection"
+            }
+          ]
+        },
+        {
+          "name": "TroopsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "TroopsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "TroopsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "TroopsFilter",
+          "fields": null
+        },
+        {
+          "name": "TroopsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "TroopsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "TroopsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "TroopsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "TroopsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "UUID",
+          "fields": null
+        },
+        {
+          "name": "UUIDFilter",
+          "fields": null
+        },
+        {
+          "name": "UUIDListFilter",
+          "fields": null
+        },
+        {
+          "name": "Units",
+          "fields": [
+            {
+              "name": "nodeId"
+            },
+            {
+              "name": "id"
+            },
+            {
+              "name": "created_at"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "updated_at"
+            },
+            {
+              "name": "troop"
+            },
+            {
+              "name": "unit_type"
+            },
+            {
+              "name": "troops"
+            },
+            {
+              "name": "membersCollection"
+            }
+          ]
+        },
+        {
+          "name": "UnitsConnection",
+          "fields": [
+            {
+              "name": "edges"
+            },
+            {
+              "name": "pageInfo"
+            }
+          ]
+        },
+        {
+          "name": "UnitsDeleteResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "UnitsEdge",
+          "fields": [
+            {
+              "name": "cursor"
+            },
+            {
+              "name": "node"
+            }
+          ]
+        },
+        {
+          "name": "UnitsFilter",
+          "fields": null
+        },
+        {
+          "name": "UnitsInsertInput",
+          "fields": null
+        },
+        {
+          "name": "UnitsInsertResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "UnitsOrderBy",
+          "fields": null
+        },
+        {
+          "name": "UnitsUpdateInput",
+          "fields": null
+        },
+        {
+          "name": "UnitsUpdateResponse",
+          "fields": [
+            {
+              "name": "affectedCount"
+            },
+            {
+              "name": "records"
+            }
+          ]
+        },
+        {
+          "name": "__Directive",
+          "fields": [
+            {
+              "name": "args"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "isRepeatable"
+            },
+            {
+              "name": "locations"
+            },
+            {
+              "name": "name"
+            }
+          ]
+        },
+        {
+          "name": "__DirectiveLocation",
+          "fields": null
+        },
+        {
+          "name": "__EnumValue",
+          "fields": [
+            {
+              "name": "deprecationReason"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "isDeprecated"
+            },
+            {
+              "name": "name"
+            }
+          ]
+        },
+        {
+          "name": "__Field",
+          "fields": [
+            {
+              "name": "args"
+            },
+            {
+              "name": "deprecationReason"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "isDeprecated"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "type"
+            }
+          ]
+        },
+        {
+          "name": "__InputValue",
+          "fields": [
+            {
+              "name": "defaultValue"
+            },
+            {
+              "name": "deprecationReason"
+            },
+            {
+              "name": "description"
+            },
+            {
+              "name": "isDeprecated"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "type"
+            }
+          ]
+        },
+        {
+          "name": "__Schema",
+          "fields": [
+            {
+              "name": "description"
+            },
+            {
+              "name": "directives"
+            },
+            {
+              "name": "mutationType"
+            },
+            {
+              "name": "queryType"
+            },
+            {
+              "name": "subscriptionType"
+            },
+            {
+              "name": "types"
+            }
+          ]
+        },
+        {
+          "name": "__Type",
+          "fields": [
+            {
+              "name": "description"
+            },
+            {
+              "name": "enumValues"
+            },
+            {
+              "name": "fields"
+            },
+            {
+              "name": "inputFields"
+            },
+            {
+              "name": "interfaces"
+            },
+            {
+              "name": "kind"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "ofType"
+            },
+            {
+              "name": "possibleTypes"
+            },
+            {
+              "name": "specifiedByURL"
+            }
+          ]
+        },
+        {
+          "name": "__TypeKind",
+          "fields": null
+        },
+        {
+          "name": "expense_status_enum",
+          "fields": null
+        },
+        {
+          "name": "expense_status_enumFilter",
+          "fields": null
+        },
+        {
+          "name": "gender_enum",
+          "fields": null
+        },
+        {
+          "name": "gender_enumFilter",
+          "fields": null
+        },
+        {
+          "name": "section_enum",
+          "fields": null
+        },
+        {
+          "name": "section_enumFilter",
+          "fields": null
+        },
+        {
+          "name": "unit_type_enum",
+          "fields": null
+        },
+        {
+          "name": "unit_type_enumFilter",
+          "fields": null
+        }
+      ]
+    }
+  }
+}

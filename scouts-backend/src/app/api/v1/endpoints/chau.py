@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies import get_db, CommonQueryParams, get_current_active_user, get_current_superuser
 from app.models.user import User as UserModel
 from app.schemas.base import MessageResponse
-from app.schemas.chau import Chau, ChauCreate, ChauUpdate, ChauList
+from app.schemas.chau import Chau, ChauCreate, ChauUpdate, ChauList, ChauSearch
 from app.services.chau import ChauService
 
 router = APIRouter()
@@ -33,6 +33,30 @@ async def get_chau_list(
     service = ChauService(db)
     chau_list, total = await service.get_chau_list(skip=commons.skip, limit=commons.limit)
     
+    return ChauList(chau=chau_list, total=total)
+
+
+@router.get(
+    "/search",
+    response_model=ChauList,
+    status_code=status.HTTP_200_OK,
+    summary="Search chau",
+    description="Search chau by name, address, or description with partial matching"
+)
+async def search_chau(
+    ten_chau: str | None = None,
+    dia_chi: str | None = None,
+    mo_ta: str | None = None,
+    commons: CommonQueryParams = Depends(),
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user),
+) -> ChauList:
+    """Search chau with optional filters."""
+    service = ChauService(db)
+    search_params = ChauSearch(ten_chau=ten_chau, dia_chi=dia_chi, mo_ta=mo_ta)
+    chau_list, total = await service.search_chau(
+        search_params, skip=commons.skip, limit=commons.limit
+    )
     return ChauList(chau=chau_list, total=total)
 
 

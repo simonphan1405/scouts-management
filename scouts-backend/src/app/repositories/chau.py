@@ -47,6 +47,69 @@ class ChauRepository:
         )
         return result.scalar_one_or_none()
     
+    async def search(
+        self,
+        ten_chau: str | None = None,
+        dia_chi: str | None = None,
+        mo_ta: str | None = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Chau]:
+        """
+        Search chau with optional filters.
+
+        Args:
+            ten_chau: Filter by name (partial, case-insensitive)
+            dia_chi: Filter by address (partial, case-insensitive)
+            mo_ta: Filter by description (partial, case-insensitive)
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+
+        Returns:
+            List of matching chau
+        """
+        query = select(Chau)
+
+        if ten_chau:
+            query = query.where(Chau.ten_chau.ilike(f"%{ten_chau}%"))
+        if dia_chi:
+            query = query.where(Chau.dia_chi.ilike(f"%{dia_chi}%"))
+        if mo_ta:
+            query = query.where(Chau.mo_ta.ilike(f"%{mo_ta}%"))
+
+        query = query.order_by(Chau.chau_id).offset(skip).limit(limit)
+        result = await self.db.execute(query)
+        return list(result.scalars().all())
+
+    async def search_count(
+        self,
+        ten_chau: str | None = None,
+        dia_chi: str | None = None,
+        mo_ta: str | None = None,
+    ) -> int:
+        """
+        Count chau matching search filters.
+
+        Args:
+            ten_chau: Filter by name (partial, case-insensitive)
+            dia_chi: Filter by address (partial, case-insensitive)
+            mo_ta: Filter by description (partial, case-insensitive)
+
+        Returns:
+            Total number of matching chau
+        """
+        query = select(func.count()).select_from(Chau)
+
+        if ten_chau:
+            query = query.where(Chau.ten_chau.ilike(f"%{ten_chau}%"))
+        if dia_chi:
+            query = query.where(Chau.dia_chi.ilike(f"%{dia_chi}%"))
+        if mo_ta:
+            query = query.where(Chau.mo_ta.ilike(f"%{mo_ta}%"))
+
+        result = await self.db.execute(query)
+        return result.scalar_one()
+
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[Chau]:
         """
         Get all chau with pagination.

@@ -58,7 +58,7 @@ export function useTableSchema(typeName: string): {
   });
 
   const columns = data?.__type?.fields
-    ? parseColumnMeta(data.__type.fields).filter((c) => c.name !== "nodeId")
+    ? parseColumnMeta(data.__type.fields).filter((c) => !["nodeId", "created_at", "updated_at"].includes(c.name))
     : [];
 
   return { columns, loading, error: error as Error | undefined };

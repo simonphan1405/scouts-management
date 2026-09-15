@@ -33,6 +33,7 @@ export const FIELD_TRANSLATIONS: Record<string, string> = {
   district: "Đạo trực thuộc",
   group: "Liên đoàn trực thuộc",
   troop: "Đoàn trực thuộc",
+  unit: "Đội trực thuộc",
   unit_type: "Loại nhóm",
   level: "Cấp",
   requirement: "Yêu cầu",
@@ -46,6 +47,15 @@ export const FIELD_TRANSLATIONS: Record<string, string> = {
   purpose: "Mục đích",
   payment_date: "Ngày thanh toán",
   notes: "Ghi chú",
+  full_name: "Họ và tên",
+  gender: "Giới tính",
+  date_of_birth: "Ngày sinh",
+  identification_number: "Số CMND/CCCD",
+  religion: "Tôn giáo",
+  join_year: "Năm gia nhập",
+  promise_year: "Năm tuyên hứa",
+  current_section: "Ngành đang sinh hoạt",
+  ranking: "Đẳng thứ",
 };
 
 export function translateTableName(name: string): string {

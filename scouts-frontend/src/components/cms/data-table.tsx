@@ -37,6 +37,8 @@ const SKELETON_HEADER_CELLS = Array.from({ length: 4 });
 const SKELETON_ROW_CELLS = Array.from({ length: 4 });
 const SKELETON_ROWS = Array.from({ length: 5 });
 
+import { translateField } from "./translations";
+
 export function DataTable({ tableName }: DataTableProps) {
   const typeName = tableName.charAt(0).toUpperCase() + tableName.slice(1);
   const { columns, loading: schemaLoading } = useTableSchema(typeName);
@@ -197,7 +199,7 @@ export function DataTable({ tableName }: DataTableProps) {
                       className="font-semibold text-xs text-muted-foreground uppercase tracking-wider relative group select-none"
                       style={{ width: colWidths[colIndex] ?? 160 }}
                     >
-                      <span className="truncate block pr-2">{col.name}</span>
+                      <span className="truncate block pr-2">{translateField(col.name)}</span>
                       <div
                         onMouseDown={(e) => handleResizeStart(e, colIndex)}
                         className="absolute top-0 right-0 w-[3px] h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
@@ -207,10 +209,10 @@ export function DataTable({ tableName }: DataTableProps) {
                     </TableHead>
                   ))}
               <TableHead
-                className="text-right font-semibold text-xs text-muted-foreground uppercase tracking-wider"
+                className="font-semibold text-xs text-muted-foreground uppercase tracking-wider"
                 style={{ width: ACTIONS_WIDTH }}
               >
-                Actions
+                Thao tác
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -232,7 +234,7 @@ export function DataTable({ tableName }: DataTableProps) {
                   colSpan={columns.length + 1}
                   className="h-40 text-center text-muted-foreground font-medium"
                 >
-                  No records found.
+                  Không tìm thấy bản ghi nào.
                 </TableCell>
               </TableRow>
             ) : (
@@ -255,7 +257,7 @@ export function DataTable({ tableName }: DataTableProps) {
                       )}
                     </TableCell>
                   ))}
-                  <TableCell className="text-right py-3">
+                  <TableCell className="py-3">
                     <RowActions
                       tableName={tableName}
                       columns={columns}
@@ -275,7 +277,7 @@ export function DataTable({ tableName }: DataTableProps) {
         <div className="flex items-center justify-between p-3 mt-4 glass rounded-xl border border-border/40">
           {/* Page size selector */}
           <div className="flex items-center gap-3 text-sm text-muted-foreground font-medium">
-            <label htmlFor="page-size-select">Rows per page</label>
+            <label htmlFor="page-size-select">Số hàng mỗi trang</label>
             <select
               id="page-size-select"
               value={pageSize}
@@ -293,7 +295,7 @@ export function DataTable({ tableName }: DataTableProps) {
           {/* Page info & navigation */}
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground/80 mr-3">
-              Page {currentPage + 1}
+              Trang {currentPage + 1}
             </span>
 
             <Button

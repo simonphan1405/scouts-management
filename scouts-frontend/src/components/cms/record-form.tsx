@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import type { ColumnMeta } from "@/lib/graphql/types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { translateField } from "./translations";
 
 const EXCLUDED = ["nodeId", "id", "created_at", "updated_at"];
 
@@ -50,7 +51,7 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
               htmlFor={col.name}
               className="text-sm font-medium capitalize"
             >
-              {col.name.replace(/_/g, " ")}
+              {translateField(col.name)}
               {!col.nullable && (
                 <span className="text-destructive ml-1" aria-hidden="true">*</span>
               )}
@@ -79,7 +80,7 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
                       : e.target.value;
                   handleChange(col.name, val);
                 }}
-                placeholder={`${col.name.replace(/_/g, " ")}…`}
+                placeholder={`${translateField(col.name)}…`}
                 required={!col.nullable}
                 autoComplete="off"
               />

@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { resetApolloClient } from "@/lib/apollo/client";
+import { translateTableName } from "./translations";
 
 const MIN_WIDTH = 180;
 const MAX_WIDTH = 480;
@@ -31,10 +32,15 @@ export function Sidebar() {
   const { tables, loading } = useTableList();
   const pathname = usePathname();
   const router = useRouter();
-  // Lazy init from localStorage — avoids setState in useEffect (rerender-lazy-state-init)
-  const [width, setWidth] = useState(() => getStoredWidth());
+  // Initialize with DEFAULT_WIDTH to match SSR and avoid hydration mismatch
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
   const isDragging = useRef(false);
   const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    // Read from localStorage after initial render to avoid hydration mismatch
+    setWidth(getStoredWidth());
+  }, []);
 
   const handleSignOut = useCallback(async () => {
     setSigningOut(true);
@@ -113,7 +119,7 @@ export function Sidebar() {
                     {isActive && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-primary rounded-r-full" />
                     )}
-                    {table.name}
+                    {translateTableName(table.name)}
                   </Link>
                 );
               })}

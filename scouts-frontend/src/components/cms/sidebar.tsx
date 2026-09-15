@@ -6,17 +6,43 @@ import { useTableList } from "@/hooks/use-introspection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Database, LogOut } from "lucide-react";
+import { ChevronDown, Database, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { resetApolloClient } from "@/lib/apollo/client";
 import { translateTableName } from "./translations";
+import { Separator } from "@/components/ui/separator";
+import type { TableMeta } from "@/lib/graphql/types";
 
 const MIN_WIDTH = 180;
 const MAX_WIDTH = 480;
 const DEFAULT_WIDTH = 240;
 const STORAGE_KEY = "cms-sidebar-width";
+
+interface MenuGroup {
+  key: string;
+  title: string;
+  tables: string[];
+}
+
+const MENU_GROUPS: MenuGroup[] = [
+  {
+    key: "org",
+    title: "Hệ thống tổ chức",
+    tables: ["councils", "districts", "groups", "troops", "units"],
+  },
+  {
+    key: "rankings",
+    title: "Ngành & Đẳng thứ",
+    tables: ["sections", "rankings"],
+  },
+  {
+    key: "management",
+    title: "Thành viên & Dữ liệu",
+    tables: ["members", "expenses", "religions"],
+  },
+];
 
 function getStoredWidth(): number {
   if (typeof window === "undefined") return DEFAULT_WIDTH;
@@ -36,6 +62,72 @@ export function Sidebar() {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const isDragging = useRef(false);
   const [signingOut, setSigningOut] = useState(false);
+
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    org: true,
+    rankings: true,
+    management: true,
+    other: true,
+  });
+
+  const toggleGroup = useCallback((key: string) => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  }, []);
+
+  const groupedData = useMemo(() => {
+    const tableMap = new Map(tables.map((t) => [t.name.toLowerCase(), t]));
+    const result: { key: string; title: string; items: TableMeta[] }[] = [];
+
+    for (const group of MENU_GROUPS) {
+      const groupItems: TableMeta[] = [];
+      for (const name of group.tables) {
+        const table = tableMap.get(name.toLowerCase());
+        if (table) {
+          groupItems.push(table);
+          tableMap.delete(name.toLowerCase());
+        }
+      }
+      if (groupItems.length > 0) {
+        result.push({
+          key: group.key,
+          title: group.title,
+          items: groupItems,
+        });
+      }
+    }
+
+    // Any remaining tables not in the predefined groups
+    if (tableMap.size > 0) {
+      result.push({
+        key: "other",
+        title: "Khác",
+        items: Array.from(tableMap.values()),
+      });
+    }
+
+    return result;
+  }, [tables]);
+
+  // Automatically expand group when navigating to one of its tables
+  useEffect(() => {
+    if (!pathname) return;
+    const currentTable = pathname
+      .replace(/^\/cms\//, "")
+      .split("/")[0]
+      ?.toLowerCase();
+    if (!currentTable) return;
+    for (const group of MENU_GROUPS) {
+      if (group.tables.includes(currentTable)) {
+        setOpenGroups((prev) =>
+          prev[group.key] ? prev : { ...prev, [group.key]: true },
+        );
+        break;
+      }
+    }
+  }, [pathname]);
 
   useEffect(() => {
     // Read from localStorage after initial render to avoid hydration mismatch
@@ -94,35 +186,109 @@ export function Sidebar() {
         <div className="p-1.5 bg-primary/10 rounded-lg">
           <Database className="h-5 w-5 text-primary" />
         </div>
-        <span className="font-bold tracking-tight text-foreground/90">CMS Dashboard</span>
+        <span className="font-bold tracking-tight text-foreground/90">
+          CMS Dashboard
+        </span>
       </div>
       <ScrollArea className="flex-1">
-        <nav className="p-3 space-y-1">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full rounded-md" />
-              ))
-            : tables.map((table) => {
-                const href = `/cms/${table.name}`;
-                const isActive = pathname === href;
-                return (
-                  <Link
-                    key={table.name}
-                    href={href}
-                    className={cn(
-                      "flex items-center px-4 py-2.5 rounded-lg text-sm capitalize transition-all duration-200 relative group overflow-hidden",
-                      isActive
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
-                    )}
-                  >
-                    {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-primary rounded-r-full" />
-                    )}
-                    {translateTableName(table.name)}
-                  </Link>
-                );
-              })}
+        <nav className="p-3">
+          {loading ? (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Skeleton className="h-5 w-28 rounded-md" />
+                <div className="space-y-1 pt-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton
+                      key={`g1-${i}`}
+                      className="h-8 w-full rounded-lg"
+                    />
+                  ))}
+                </div>
+              </div>
+              <Separator className="bg-border/40" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-5 w-24 rounded-md" />
+                <div className="space-y-1 pt-1">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <Skeleton
+                      key={`g2-${i}`}
+                      className="h-8 w-full rounded-lg"
+                    />
+                  ))}
+                </div>
+              </div>
+              <Separator className="bg-border/40" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-5 w-36 rounded-md" />
+                <div className="space-y-1 pt-1">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton
+                      key={`g3-${i}`}
+                      className="h-8 w-full rounded-lg"
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            groupedData.map((group, groupIndex) => {
+              const isOpen = openGroups[group.key] ?? true;
+              return (
+                <div key={group.key}>
+                  {groupIndex > 0 && (
+                    <Separator className="bg-border/40 my-2.5" />
+                  )}
+                  <div className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(group.key)}
+                      className="flex items-center justify-between w-full px-2.5 py-1.5 text-xs font-semibold text-muted-foreground/80 hover:text-foreground rounded-md hover:bg-accent/40 transition-colors select-none cursor-pointer group"
+                    >
+                      <span className="truncate">{group.title}</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-3.5 w-3.5 shrink-0 transition-transform duration-200 text-muted-foreground/60 group-hover:text-foreground",
+                          !isOpen && "-rotate-90",
+                        )}
+                      />
+                    </button>
+                    <div
+                      className={cn(
+                        "grid transition-all duration-200 ease-in-out",
+                        isOpen
+                          ? "grid-rows-[1fr] opacity-100"
+                          : "grid-rows-[0fr] opacity-0 pointer-events-none",
+                      )}
+                    >
+                      <div className="overflow-hidden space-y-0.5">
+                        {group.items.map((table) => {
+                          const href = `/cms/${table.name}`;
+                          const isActive = pathname === href;
+                          return (
+                            <Link
+                              key={table.name}
+                              href={href}
+                              className={cn(
+                                "flex items-center px-4 py-2 rounded-lg text-sm capitalize transition-all duration-200 relative group overflow-hidden",
+                                isActive
+                                  ? "bg-primary/10 text-primary font-semibold"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+                              )}
+                            >
+                              {isActive && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-primary rounded-r-full" />
+                              )}
+                              {translateTableName(table.name)}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </nav>
       </ScrollArea>
 
@@ -136,7 +302,9 @@ export function Sidebar() {
           disabled={signingOut}
         >
           <LogOut className="h-4 w-4" />
-          <span className="font-medium">{signingOut ? "Signing out…" : "Sign out"}</span>
+          <span className="font-medium">
+            {signingOut ? "Signing out…" : "Sign out"}
+          </span>
         </Button>
       </div>
 

@@ -20,11 +20,14 @@ function getInitialSidebarWidth(): number {
 }
 
 export default function CmsLayout({ children }: { children: React.ReactNode }) {
-  // Lazy init avoids setState in useEffect (rerender-lazy-state-init)
-  const [sidebarWidth, setSidebarWidth] = useState(getInitialSidebarWidth);
+  // Initialize with DEFAULT_WIDTH to match SSR and avoid hydration mismatch
+  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_WIDTH);
 
   // Subscribe to sidebar resize via ResizeObserver (external system — useEffect is correct here)
   useEffect(() => {
+    // Read from localStorage after initial render to avoid hydration mismatch
+    setSidebarWidth(getInitialSidebarWidth());
+
     const sidebar = document.querySelector("aside");
     if (!sidebar) return;
 

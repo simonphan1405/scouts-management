@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CreateModal } from "./create-modal";
 import type { ColumnMeta } from "@/lib/graphql/types";
+import { translateTableName } from "./translations";
 
 interface CmsHeaderProps {
   tableName: string;
@@ -19,7 +20,7 @@ export function CmsHeader({ tableName, columns, onCreated }: CmsHeaderProps) {
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold capitalize tracking-tight bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">{tableName}</h1>
+          <h1 className="text-3xl font-extrabold capitalize tracking-tight bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">{translateTableName(tableName)}</h1>
           <p className="text-sm font-medium text-muted-foreground mt-1">Manage database records</p>
         </div>
         <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">{columns.length} columns</Badge>

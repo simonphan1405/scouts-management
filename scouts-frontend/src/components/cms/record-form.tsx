@@ -31,6 +31,8 @@ interface RecordFormProps {
   onChange: (values: Record<string, unknown>) => void;
 }
 
+const FULL_WIDTH_FIELDS = ["notes", "description", "content", "address", "requirement"];
+
 export function RecordForm({ columns, values, onChange }: RecordFormProps) {
   const writableColumns = columns.filter((c) => !EXCLUDED.includes(c.name));
 
@@ -42,14 +44,18 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {writableColumns.map((col) => {
         const inputType = getInputType(col.type);
+        const isFullWidth = FULL_WIDTH_FIELDS.includes(col.name.toLowerCase());
         return (
-          <div key={col.name} className="space-y-1">
+          <div
+            key={col.name}
+            className={`space-y-1.5 ${isFullWidth ? "sm:col-span-2" : ""}`}
+          >
             <Label
               htmlFor={col.name}
-              className="text-sm font-medium capitalize"
+              className="text-sm font-medium"
             >
               {translateField(col.name)}
               {!col.nullable && (
@@ -57,14 +63,16 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
               )}
             </Label>
             {inputType === "checkbox" ? (
-              <input
-                id={col.name}
-                name={col.name}
-                type="checkbox"
-                checked={Boolean(values[col.name])}
-                onChange={(e) => handleChange(col.name, e.target.checked)}
-                className="h-4 w-4"
-              />
+              <div className="flex items-center h-9">
+                <input
+                  id={col.name}
+                  name={col.name}
+                  type="checkbox"
+                  checked={Boolean(values[col.name])}
+                  onChange={(e) => handleChange(col.name, e.target.checked)}
+                  className="h-4 w-4 rounded border-border focus:ring-primary cursor-pointer"
+                />
+              </div>
             ) : (
               <Input
                 id={col.name}

@@ -48,11 +48,13 @@ export function EditModal({ tableName, columns, row, onUpdated }: EditModalProps
           <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit {tableName} Record</DialogTitle>
         </DialogHeader>
-        <RecordForm columns={columns} values={values} onChange={setValues} />
+        <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
+          <RecordForm columns={columns} values={values} onChange={setValues} />
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel

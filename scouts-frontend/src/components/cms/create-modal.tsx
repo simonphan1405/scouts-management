@@ -43,11 +43,13 @@ export function CreateModal({ tableName, columns, onCreated }: CreateModalProps)
           New Record
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Create {tableName} Record</DialogTitle>
         </DialogHeader>
-        <RecordForm columns={columns} values={values} onChange={setValues} />
+        <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
+          <RecordForm columns={columns} values={values} onChange={setValues} />
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={handleCancel}>
             Cancel

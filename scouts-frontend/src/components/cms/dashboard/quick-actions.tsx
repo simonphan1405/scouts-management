@@ -14,14 +14,24 @@ import {
   Flame,
   ArrowUpRight,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function QuickActions() {
+interface QuickActionsProps {
+  loading?: boolean;
+  tableCounts?: Record<string, number>;
+}
+
+export function QuickActions({
+  loading = false,
+  tableCounts = {},
+}: QuickActionsProps) {
   const quickLinks = [
     {
       title: "Đoàn Sinh",
       name: "members",
       icon: Users,
       desc: "Hồ sơ cá nhân, đẳng thứ & liên lạc",
+      countLabel: `${tableCounts.members ?? 0} hồ sơ`,
       color: "#7D58D9",
     },
     {
@@ -29,6 +39,7 @@ export function QuickActions() {
       name: "sections",
       icon: Compass,
       desc: "Nhi, Ấu, Thiếu, Kha, Tráng",
+      countLabel: `${tableCounts.sections ?? 5} ngành`,
       color: "#5CB856",
     },
     {
@@ -36,6 +47,7 @@ export function QuickActions() {
       name: "rankings",
       icon: Award,
       desc: "Cấp bậc thăng tiến & yêu cầu",
+      countLabel: `${tableCounts.rankings ?? 0} cấp bậc`,
       color: "#EDB55E",
     },
     {
@@ -43,6 +55,7 @@ export function QuickActions() {
       name: "expenses",
       icon: DollarSign,
       desc: "Sổ thu chi & ngân sách trại",
+      countLabel: `${tableCounts.expenses ?? 0} khoản chi`,
       color: "#E01205",
     },
     {
@@ -50,6 +63,7 @@ export function QuickActions() {
       name: "groups",
       icon: Building,
       desc: "Quản lý các liên đoàn trực thuộc",
+      countLabel: `${tableCounts.groups ?? 0} liên đoàn`,
       color: "#881337",
     },
     {
@@ -57,6 +71,7 @@ export function QuickActions() {
       name: "troops",
       icon: Flag,
       desc: "Chi tiết các đoàn chuyên ngành",
+      countLabel: `${tableCounts.troops ?? 0} đoàn`,
       color: "#F97316",
     },
     {
@@ -64,6 +79,7 @@ export function QuickActions() {
       name: "religions",
       icon: BookOpen,
       desc: "Danh mục tôn giáo đoàn sinh",
+      countLabel: `${tableCounts.religions ?? 0} tôn giáo`,
       color: "#7D58D9",
     },
     {
@@ -71,6 +87,7 @@ export function QuickActions() {
       name: "councils",
       icon: Globe2,
       desc: "Cấp quản hạt lãnh thổ lớn",
+      countLabel: `${tableCounts.councils ?? 0} châu`,
       color: "#5CB856",
     },
     {
@@ -78,6 +95,7 @@ export function QuickActions() {
       name: "districts",
       icon: MapPin,
       desc: "Phân chia địa bàn hoạt động",
+      countLabel: `${tableCounts.districts ?? 0} đạo`,
       color: "#EDB55E",
     },
     {
@@ -85,6 +103,7 @@ export function QuickActions() {
       name: "units",
       icon: Flame,
       desc: "Đội tuần sinh hoạt cơ sở",
+      countLabel: `${tableCounts.units ?? 0} đội`,
       color: "#E01205",
     },
   ];
@@ -97,7 +116,7 @@ export function QuickActions() {
             Truy Cập Nhanh Cơ Sở Dữ Liệu
           </h3>
           <p className="text-xs text-muted-foreground">
-            10 bảng dữ liệu chính của Hệ thống Quản lý Hướng Đạo
+            Số lượng bản ghi thực tế trong 10 bảng dữ liệu hệ thống
           </p>
         </div>
       </div>
@@ -126,11 +145,20 @@ export function QuickActions() {
               </div>
 
               <div className="mt-2.5">
-                <span className="font-bold text-xs text-foreground group-hover:text-primary transition-colors block">
-                  {item.title}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-foreground group-hover:text-primary transition-colors block">
+                    {item.title}
+                  </span>
+                  {loading ? (
+                    <Skeleton className="h-3 w-10" />
+                  ) : (
+                    <span className="text-[10px] font-bold text-primary">
+                      {item.countLabel.split(" ")[0]}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[10px] text-muted-foreground block truncate">
-                  {item.desc}
+                  {loading ? "Đang tải…" : item.countLabel}
                 </span>
               </div>
             </Link>

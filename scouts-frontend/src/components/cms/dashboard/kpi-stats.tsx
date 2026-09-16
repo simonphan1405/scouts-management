@@ -2,81 +2,119 @@
 
 import Link from "next/link";
 import { Users, Layers, Building2, Wallet, ArrowUpRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface KpiStatsProps {
-  memberCount?: number;
-  sectionCount?: number;
-  unitCounts?: {
+  loading?: boolean;
+  memberCount: number;
+  sectionCount: number;
+  unitCounts: {
     councils: number;
     districts: number;
     groups: number;
     troops: number;
     units: number;
   };
-  expenseTotal?: number;
+  expenseTotal: number;
 }
 
 export function KpiStats({
-  memberCount = 142,
+  loading = false,
+  memberCount = 0,
   sectionCount = 5,
   unitCounts = {
-    councils: 2,
-    districts: 6,
-    groups: 18,
-    troops: 42,
-    units: 96,
+    councils: 0,
+    districts: 0,
+    groups: 0,
+    troops: 0,
+    units: 0,
   },
-  expenseTotal = 24500000,
+  expenseTotal = 0,
 }: KpiStatsProps) {
-  const totalUnits =
-    unitCounts.groups + unitCounts.troops + unitCounts.units;
+  const totalUnits = unitCounts.groups + unitCounts.troops + unitCounts.units;
 
   const stats = [
     {
       title: "Tổng Đoàn Sinh & Huynh Trưởng",
-      value: memberCount.toLocaleString("vi-VN"),
-      subtitle: "Đang sinh hoạt tích cực",
-      badge: "+12% quý này",
+      value: `${memberCount.toLocaleString("vi-VN")}`,
+      unit: "người",
+      subtitle:
+        memberCount > 0
+          ? "Đang sinh hoạt trong cơ sở dữ liệu"
+          : "Chưa có dữ liệu đoàn sinh",
+      badge: memberCount > 0 ? "CSDL thực tế" : "Chưa có hồ sơ",
       icon: Users,
-      color: "#7D58D9", // Royal Scout Purple
+      color: "#7D58D9",
       bgGradient: "from-[#7D58D9]/10 to-[#7D58D9]/5",
       borderColor: "border-[#7D58D9]/20",
       href: "/cms/members",
     },
     {
       title: "5 Ngành Hướng Đạo",
-      value: `${sectionCount} Ngành`,
+      value: `${sectionCount}`,
+      unit: "ngành",
       subtitle: "Nhi • Ấu • Thiếu • Kha • Tráng",
-      badge: "Đầy đủ ngành",
+      badge: "Đầy đủ 5 ngành",
       icon: Layers,
-      color: "#5CB856", // Emerald Green
+      color: "#5CB856",
       bgGradient: "from-[#5CB856]/10 to-[#5CB856]/5",
       borderColor: "border-[#5CB856]/20",
       href: "/cms/sections",
     },
     {
-      title: "Đơn Vị & Nhóm Sinh Hoạt",
-      value: `${totalUnits} Đơn vị`,
+      title: "Đơn Vị Sinh Hoạt Cơ Sở",
+      value: `${totalUnits}`,
+      unit: "đơn vị",
       subtitle: `${unitCounts.groups} Liên đoàn • ${unitCounts.troops} Đoàn • ${unitCounts.units} Đội`,
-      badge: "Toàn quốc",
+      badge: `${unitCounts.councils} Châu • ${unitCounts.districts} Đạo`,
       icon: Building2,
-      color: "#EDB55E", // Amber Yellow
+      color: "#EDB55E",
       bgGradient: "from-[#EDB55E]/15 to-[#EDB55E]/5",
       borderColor: "border-[#EDB55E]/25",
       href: "/cms/troops",
     },
     {
-      title: "Kinh Phí & Hoạt Động",
-      value: `${(expenseTotal / 1000000).toFixed(1)} triệu đ`,
-      subtitle: "Chi phí trại & sinh hoạt",
-      badge: "Minh bạch",
+      title: "Kinh Phí & Ngân Sách",
+      value:
+        expenseTotal >= 1000000
+          ? `${(expenseTotal / 1000000).toFixed(1)} tr`
+          : `${expenseTotal.toLocaleString("vi-VN")}`,
+      unit: "VNĐ",
+      subtitle:
+        expenseTotal > 0
+          ? "Tổng chi phí hoạt động đã ghi nhận"
+          : "Chưa ghi nhận khoản chi",
+      badge: expenseTotal > 0 ? "Đã ghi nhận" : "0 khoản chi",
       icon: Wallet,
-      color: "#E01205", // Red
+      color: "#E01205",
       bgGradient: "from-[#E01205]/10 to-[#E01205]/5",
       borderColor: "border-[#E01205]/20",
       href: "/cms/expenses",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-xl border border-border/40 bg-card p-5 space-y-4"
+          >
+            <div className="flex justify-between items-start">
+              <Skeleton className="h-10 w-10 rounded-xl" />
+              <Skeleton className="h-4 w-12 rounded-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-24 rounded-md" />
+              <Skeleton className="h-4 w-36 rounded-md" />
+              <Skeleton className="h-3 w-48 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -109,11 +147,16 @@ export function KpiStats({
 
             <div className="mt-4 space-y-1">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl font-black tracking-tight text-foreground">
-                  {item.value}
-                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl font-black tracking-tight text-foreground">
+                    {item.value}
+                  </span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {item.unit}
+                  </span>
+                </div>
                 <span
-                  className="text-[11px] font-medium px-2 py-0.5 rounded-full border shadow-2xs"
+                  className="text-[11px] font-medium px-2 py-0.5 rounded-full border shadow-2xs truncate"
                   style={{
                     backgroundColor: `${item.color}12`,
                     borderColor: `${item.color}30`,

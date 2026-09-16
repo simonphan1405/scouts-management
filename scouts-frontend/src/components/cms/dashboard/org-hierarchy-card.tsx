@@ -10,8 +10,29 @@ import {
   ArrowRight,
   ExternalLink,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function OrgHierarchyCard() {
+interface OrgHierarchyCardProps {
+  loading?: boolean;
+  unitCounts?: {
+    councils: number;
+    districts: number;
+    groups: number;
+    troops: number;
+    units: number;
+  };
+}
+
+export function OrgHierarchyCard({
+  loading = false,
+  unitCounts = {
+    councils: 0,
+    districts: 0,
+    groups: 0,
+    troops: 0,
+    units: 0,
+  },
+}: OrgHierarchyCardProps) {
   const levels = [
     {
       level: "Cấp 1",
@@ -19,7 +40,7 @@ export function OrgHierarchyCard() {
       name: "Châu",
       english: "Councils",
       desc: "Vùng quản hạt lãnh thổ cao nhất",
-      count: "2 Châu",
+      count: `${unitCounts.councils} Châu`,
       icon: Globe2,
       color: "#7D58D9",
       href: "/cms/councils",
@@ -30,7 +51,7 @@ export function OrgHierarchyCard() {
       name: "Đạo",
       english: "Districts",
       desc: "Khu vực trực thuộc Châu",
-      count: "6 Đạo",
+      count: `${unitCounts.districts} Đạo`,
       icon: MapPin,
       color: "#5CB856",
       href: "/cms/districts",
@@ -41,7 +62,7 @@ export function OrgHierarchyCard() {
       name: "Liên đoàn",
       english: "Scout Groups",
       desc: "Cụm các đoàn đa ngành sinh hoạt",
-      count: "18 Liên đoàn",
+      count: `${unitCounts.groups} Liên đoàn`,
       icon: Building,
       color: "#EDB55E",
       href: "/cms/groups",
@@ -52,7 +73,7 @@ export function OrgHierarchyCard() {
       name: "Đoàn",
       english: "Troops / Packs",
       desc: "Tổ chức theo từng ngành cụ thể",
-      count: "42 Đoàn",
+      count: `${unitCounts.troops} Đoàn`,
       icon: Flag,
       color: "#881337",
       href: "/cms/troops",
@@ -63,7 +84,7 @@ export function OrgHierarchyCard() {
       name: "Đội / Bầy",
       english: "Patrols / Sixes",
       desc: "Hàng đội tự trị nòng cốt",
-      count: "96 Đội",
+      count: `${unitCounts.units} Đội`,
       icon: Users2,
       color: "#E01205",
       href: "/cms/units",
@@ -78,8 +99,9 @@ export function OrgHierarchyCard() {
             <span>Sơ Đồ Hệ Thống Tổ Chức Hướng Đạo</span>
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Mô hình cấu trúc 5 tầng từ Châu quản hạt đến từng Đội tự trị của
-            phong trào Hướng Đạo.
+            Dữ liệu thực tế: {unitCounts.councils} Châu • {unitCounts.districts}{" "}
+            Đạo • {unitCounts.groups} Liên đoàn • {unitCounts.troops} Đoàn •{" "}
+            {unitCounts.units} Đội.
           </p>
         </div>
 
@@ -131,7 +153,13 @@ export function OrgHierarchyCard() {
                 </p>
 
                 <div className="mt-3 pt-2.5 border-t border-border/30 flex items-center justify-between text-xs font-semibold">
-                  <span className="text-foreground/80">{lvl.count}</span>
+                  {loading ? (
+                    <Skeleton className="h-4 w-16" />
+                  ) : (
+                    <span className="text-foreground/80 font-bold">
+                      {lvl.count}
+                    </span>
+                  )}
                   <span className="text-primary text-[11px] font-medium flex items-center">
                     Xem bảng <ArrowRight className="h-3 w-3 ml-0.5" />
                   </span>

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { resetApolloClient } from "@/lib/apollo/client";
-import { translateTableName } from "./translations";
+import { translateTableName } from "@/lib/i18n";
 import { Separator } from "@/components/ui/separator";
 import type { TableMeta } from "@/lib/graphql/types";
 

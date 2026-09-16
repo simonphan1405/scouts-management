@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CreateModal } from "./create-modal";
 import type { ColumnMeta } from "@/lib/graphql/types";
-import { translateTableName } from "./translations";
+import { translateTableName } from "@/lib/i18n";
 
 interface CmsHeaderProps {
   tableName: string;

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react";
+import { translateField } from "@/lib/i18n";
 
 interface DataTableProps {
   tableName: string;
@@ -36,8 +37,6 @@ const ACTIONS_WIDTH = 90;
 const SKELETON_HEADER_CELLS = Array.from({ length: 4 });
 const SKELETON_ROW_CELLS = Array.from({ length: 4 });
 const SKELETON_ROWS = Array.from({ length: 5 });
-
-import { translateField } from "./translations";
 
 export function DataTable({ tableName }: DataTableProps) {
   const typeName = tableName.charAt(0).toUpperCase() + tableName.slice(1);
@@ -115,13 +114,13 @@ export function DataTable({ tableName }: DataTableProps) {
   // Sync colWidths when columns change (initializing from schema — intentional setState in effect)
   useEffect(() => {
     if (columns.length > 0) {
-      setColWidths((prev) => { // eslint-disable-line react-hooks/set-state-in-effect
+      setColWidths((prev) => {
+        // eslint-disable-line react-hooks/set-state-in-effect
         if (prev.length === columns.length) return prev;
         return columns.map(() => 160);
       });
     }
   }, [columns]);
-
 
   const handleResizeStart = useCallback(
     (e: React.MouseEvent, colIndex: number) => {
@@ -199,10 +198,12 @@ export function DataTable({ tableName }: DataTableProps) {
                       className="font-semibold text-xs text-muted-foreground uppercase tracking-wider relative group select-none"
                       style={{ width: colWidths[colIndex] ?? 160 }}
                     >
-                      <span className="truncate block pr-2">{translateField(col.name)}</span>
+                      <span className="truncate block pr-2">
+                        {translateField(col.name)}
+                      </span>
                       <div
                         onMouseDown={(e) => handleResizeStart(e, colIndex)}
-                        className="absolute top-0 right-0 w-[3px] h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
+                        className="absolute top-0 right-0 w-0.75 h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
                         style={{ touchAction: "none" }}
                         aria-hidden="true"
                       />
@@ -253,7 +254,9 @@ export function DataTable({ tableName }: DataTableProps) {
                           null
                         </span>
                       ) : (
-                        <span className="font-medium text-foreground/90">{String(row[col.name])}</span>
+                        <span className="font-medium text-foreground/90">
+                          {String(row[col.name])}
+                        </span>
                       )}
                     </TableCell>
                   ))}

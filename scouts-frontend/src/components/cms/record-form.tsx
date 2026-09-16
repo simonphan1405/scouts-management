@@ -5,6 +5,7 @@ import type { ColumnMeta } from "@/lib/graphql/types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { translateField } from "@/lib/i18n";
+import { RelationSelect } from "./relation-select";
 
 const EXCLUDED = ["nodeId", "id", "created_at", "updated_at"];
 
@@ -62,7 +63,19 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
                 <span className="text-destructive ml-1" aria-hidden="true">*</span>
               )}
             </Label>
-            {inputType === "checkbox" ? (
+
+            {/* FK relation field → dropdown select */}
+            {col.relationTo ? (
+              <RelationSelect
+                id={col.name}
+                name={col.name}
+                collectionField={col.relationTo}
+                value={String(values[col.name] ?? "")}
+                nullable={col.nullable}
+                placeholder={translateField(col.name)}
+                onChange={(val) => handleChange(col.name, val)}
+              />
+            ) : inputType === "checkbox" ? (
               <div className="flex items-center h-9">
                 <input
                   id={col.name}
@@ -99,4 +112,3 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
     </div>
   );
 }
-

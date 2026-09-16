@@ -7,10 +7,7 @@ import {
   type ScoutSectionInfo,
 } from "@/lib/constants/scout-theme";
 import {
-  Sun,
-  Sparkles,
   Compass,
-  Mountain,
   ShieldCheck,
   ChevronRight,
   Award,
@@ -19,13 +16,21 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BeaverIcon } from "@/components/ui/beaver-icon";
+import { WolfIcon } from "@/components/ui/wolf-icon";
+import { ScoutEmblem } from "@/components/ui/scout-emblem";
+import { KhaEmblem } from "@/components/ui/kha-emblem";
+
+function ThieuScoutEmblem(props: React.ComponentProps<typeof ScoutEmblem>) {
+  return <ScoutEmblem color="currentColor" petalFill="none" {...props} />;
+}
 
 // Match specific scout section icons
 const SECTION_ICONS = {
-  nhi: Sun, // Chim non
-  au: Sparkles, // Sói con
-  thieu: Compass, // La bàn / Sắp sẵn
-  kha: Mountain, // Khám phá / Vượt đỉnh
+  nhi: BeaverIcon, // Con hải ly (Beavers)
+  au: WolfIcon, // Con sói (Cub Scouts / Wolf)
+  thieu: ThieuScoutEmblem, // Hoa Bách Hợp (Scout Emblem)
+  kha: KhaEmblem, // Huy hiệu Ngành Kha (Khai Phá)
   trang: ShieldCheck, // Phụng sự / Giúp ích
 };
 

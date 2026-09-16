@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import type { ColumnMeta } from "@/lib/graphql/types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { translateField } from "./translations";
+import { translateField } from "@/lib/i18n";
 
 const EXCLUDED = ["nodeId", "id", "created_at", "updated_at"];
 

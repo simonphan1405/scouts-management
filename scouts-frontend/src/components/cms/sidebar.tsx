@@ -6,12 +6,13 @@ import { useTableList } from "@/hooks/use-introspection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Database, LogOut } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { ScoutEmblem } from "@/components/ui/scout-emblem";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { resetApolloClient } from "@/lib/apollo/client";
-import { translateTableName } from "@/lib/i18n";
+import { translateTableName } from "@/lib/i18n/cms";
 import { Separator } from "@/components/ui/separator";
 import type { TableMeta } from "@/lib/graphql/types";
 
@@ -73,9 +74,19 @@ export function Sidebar() {
   const toggleGroup = useCallback((key: string) => {
     setOpenGroups((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [key]: !(prev[key] ?? true),
     }));
   }, []);
+
+  const currentTable = useMemo(() => {
+    if (!pathname) return "";
+    return (
+      pathname
+        .replace(/^\/cms\//, "")
+        .split("/")[0]
+        ?.toLowerCase() ?? ""
+    );
+  }, [pathname]);
 
   const groupedData = useMemo(() => {
     const tableMap = new Map(tables.map((t) => [t.name.toLowerCase(), t]));
@@ -111,27 +122,12 @@ export function Sidebar() {
     return result;
   }, [tables]);
 
-  // Automatically expand group when navigating to one of its tables
   useEffect(() => {
-    if (!pathname) return;
-    const currentTable = pathname
-      .replace(/^\/cms\//, "")
-      .split("/")[0]
-      ?.toLowerCase();
-    if (!currentTable) return;
-    for (const group of MENU_GROUPS) {
-      if (group.tables.includes(currentTable)) {
-        setOpenGroups((prev) =>
-          prev[group.key] ? prev : { ...prev, [group.key]: true },
-        );
-        break;
-      }
+    // Read from localStorage after initial render via rAF to avoid hydration mismatch
+    const stored = getStoredWidth();
+    if (stored !== DEFAULT_WIDTH) {
+      window.requestAnimationFrame(() => setWidth(stored));
     }
-  }, [pathname]);
-
-  useEffect(() => {
-    // Read from localStorage after initial render to avoid hydration mismatch
-    setWidth(getStoredWidth());
   }, []);
 
   const handleSignOut = useCallback(async () => {
@@ -177,21 +173,57 @@ export function Sidebar() {
     };
   }, []);
 
+  const isDashboardActive = pathname === "/cms";
+
   return (
     <aside
       className="shrink-0 border-r border-border/40 bg-card/60 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 select-none transition-[width] duration-300 ease-out z-40"
       style={{ width }}
     >
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-border/40">
-        <div className="p-1.5 bg-primary/10 rounded-lg">
-          <Database className="h-5 w-5 text-primary" />
+      {/* Top Brand Header with Scouts Management */}
+      <Link
+        href="/cms"
+        className="flex items-center gap-3 px-5 py-4 border-b border-border/40 hover:bg-accent/40 transition-colors group"
+      >
+        <div className="shrink-0 group-hover:scale-105 transition-transform">
+          <ScoutEmblem className="h-8 w-8 drop-shadow-xs" />
         </div>
-        <span className="font-bold tracking-tight text-foreground/90">
-          CMS Dashboard
-        </span>
-      </div>
+        <div className="flex flex-col min-w-0">
+          <span className="font-bold tracking-tight text-foreground/90 text-sm truncate">
+            Scouts Management
+          </span>
+          <span className="text-[11px] font-medium text-muted-foreground truncate">
+            Quản Lý Hướng Đạo
+          </span>
+        </div>
+      </Link>
+
+      {/* Quick Color Palette Accent Strip */}
       <ScrollArea className="flex-1">
         <nav className="p-3">
+          {/* Top Overview / Dashboard Link */}
+          <div className="mb-2">
+            <Link
+              href="/cms"
+              className={cn(
+                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 relative group",
+                isDashboardActive
+                  ? "bg-primary/10 text-primary font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+              )}
+            >
+              {isDashboardActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/5 bg-primary rounded-r-full" />
+              )}
+              <LayoutDashboard className="h-4 w-4 shrink-0 text-primary" />
+              <span className="truncate">Tổng quan</span>
+              <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+                Live
+              </span>
+            </Link>
+          </div>
+
+          <Separator className="bg-border/40 my-2" />
           {loading ? (
             <div className="space-y-3">
               <div className="space-y-1.5">
@@ -232,7 +264,12 @@ export function Sidebar() {
             </div>
           ) : (
             groupedData.map((group, groupIndex) => {
-              const isOpen = openGroups[group.key] ?? true;
+              const isOpen =
+                (Boolean(currentTable) &&
+                  group.items.some(
+                    (item) => item.name.toLowerCase() === currentTable,
+                  )) ||
+                (openGroups[group.key] ?? true);
               return (
                 <div key={group.key}>
                   {groupIndex > 0 && (

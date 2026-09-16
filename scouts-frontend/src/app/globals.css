@@ -7,19 +7,19 @@
   --card-foreground: 240 10% 3.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 3.9%;
-  --primary: 238 82% 60%;
+  --primary: 257 65% 60%;
   --primary-foreground: 0 0% 98%;
   --secondary: 240 4.8% 95.9%;
   --secondary-foreground: 240 5.9% 10%;
   --muted: 240 4.8% 95.9%;
   --muted-foreground: 240 3.8% 46.1%;
-  --accent: 238 82% 95%;
-  --accent-foreground: 238 82% 40%;
+  --accent: 257 35% 95%;
+  --accent-foreground: 257 65% 45%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
-  --ring: 238 82% 60%;
+  --ring: 257 65% 60%;
   --radius: 0.75rem;
 }
 
@@ -31,19 +31,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 238 82% 65%;
+    --primary: 257 70% 68%;
     --primary-foreground: 0 0% 98%;
     --secondary: 240 5% 12%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 5% 12%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 238 40% 15%;
-    --accent-foreground: 238 82% 75%;
+    --accent: 257 30% 18%;
+    --accent-foreground: 257 65% 75%;
     --destructive: 0 62.8% 50.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5% 15%;
     --input: 240 5% 15%;
-    --ring: 238 82% 65%;
+    --ring: 257 70% 68%;
   }
 }
 
@@ -125,4 +125,23 @@ body {
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
+}
+
+/* Scout Reference Palette Ribbon */
+.scout-palette-strip {
+  background: linear-gradient(
+    90deg,
+    #E01205 0%,
+    #E01205 16.66%,
+    #EDB55E 16.66%,
+    #EDB55E 33.33%,
+    #7D58D9 33.33%,
+    #7D58D9 50%,
+    #D6C3DF 50%,
+    #D6C3DF 66.66%,
+    #E1E1E1 66.66%,
+    #E1E1E1 83.33%,
+    #5CB856 83.33%,
+    #5CB856 100%
+  );
 }

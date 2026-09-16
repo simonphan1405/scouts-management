@@ -25,8 +25,10 @@ export default function CmsLayout({ children }: { children: React.ReactNode }) {
 
   // Subscribe to sidebar resize via ResizeObserver (external system — useEffect is correct here)
   useEffect(() => {
-    // Read from localStorage after initial render to avoid hydration mismatch
-    setSidebarWidth(getInitialSidebarWidth());
+    const initial = getInitialSidebarWidth();
+    if (initial !== DEFAULT_WIDTH) {
+      window.requestAnimationFrame(() => setSidebarWidth(initial));
+    }
 
     const sidebar = document.querySelector("aside");
     if (!sidebar) return;

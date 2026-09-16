@@ -1,14 +1,10 @@
+import { ScoutsDashboard } from "@/components/cms/dashboard/scouts-dashboard";
+
+export const metadata = {
+  title: "Scouts Management | Bảng Điều Hành Hướng Đạo",
+  description: "Hệ thống quản lý đoàn sinh, các ngành sinh hoạt, đơn vị tổ chức và dữ liệu phong trào Hướng Đạo.",
+};
+
 export default function CmsIndexPage() {
-  return (
-    <div className="flex h-[60vh] items-center justify-center">
-      <div className="text-center space-y-2">
-        <p className="text-muted-foreground text-lg">
-          Select a table from the sidebar
-        </p>
-        <p className="text-muted-foreground text-sm">
-          Choose a table on the left to view and manage its records.
-        </p>
-      </div>
-    </div>
-  );
+  return <ScoutsDashboard />;
 }

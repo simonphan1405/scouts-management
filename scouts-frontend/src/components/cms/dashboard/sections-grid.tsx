@@ -15,31 +15,39 @@ import {
   ChevronRight,
   Award,
   Users,
+  Flag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Match specific scout section icons
 const SECTION_ICONS = {
-  nhi: Sun, // Chim non / Mặt trời buổi sớm
-  au: Sparkles, // Sói con / Mắt mở - Tai thính
-  thieu: Compass, // La bàn / Rừng xanh / Sắp sẵn
-  kha: Mountain, // Khám phá / Vượt đỉnh núi cao
-  trang: ShieldCheck, // Phụng sự / Trách nhiệm xã hội
+  nhi: Sun, // Chim non
+  au: Sparkles, // Sói con
+  thieu: Compass, // La bàn / Sắp sẵn
+  kha: Mountain, // Khám phá / Vượt đỉnh
+  trang: ShieldCheck, // Phụng sự / Giúp ích
 };
 
-// Realistic demonstration member distribution per section
-const SECTION_STATS: Record<
-  string,
-  { members: number; units: number; percentage: number }
-> = {
-  nhi: { members: 18, units: 3, percentage: 12 },
-  au: { members: 38, units: 6, percentage: 27 },
-  thieu: { members: 46, units: 8, percentage: 32 },
-  kha: { members: 24, units: 4, percentage: 17 },
-  trang: { members: 16, units: 3, percentage: 12 },
-};
+export interface SectionLiveStats {
+  memberCount: number;
+  troopCount: number;
+  rankingCount: number;
+  rankings: string[];
+  percentage: number;
+}
 
-export function SectionsGrid() {
+interface SectionsGridProps {
+  loading?: boolean;
+  sectionStats?: Record<string, SectionLiveStats>;
+  totalMembers?: number;
+}
+
+export function SectionsGrid({
+  loading = false,
+  sectionStats = {},
+  totalMembers = 0,
+}: SectionsGridProps) {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   return (
@@ -52,6 +60,9 @@ export function SectionsGrid() {
               5 Ngành Sinh Hoạt
             </span>
           </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Dữ liệu thực tế phân theo từng Ngành: Nhi (Cam), Ấu (Vàng), Thiếu (Xanh lá), Kha (Đỏ bầm), Tráng (Đỏ).
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -73,25 +84,51 @@ export function SectionsGrid() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {SCOUT_SECTIONS_LIST.map((section: ScoutSectionInfo) => {
           const Icon = SECTION_ICONS[section.key] || Compass;
-          const stats = SECTION_STATS[section.key] ?? {
-            members: 20,
-            units: 4,
-            percentage: 20,
+          const liveStat = sectionStats[section.key] ?? {
+            memberCount: 0,
+            troopCount: 0,
+            rankingCount: 0,
+            rankings: section.rankings,
+            percentage: 0,
           };
           const isSelected = selectedKey === section.key;
+          const displayRankings =
+            liveStat.rankings && liveStat.rankings.length > 0
+              ? liveStat.rankings
+              : section.rankings;
+
+          if (loading) {
+            return (
+              <div
+                key={section.key}
+                className="rounded-xl border border-border/40 bg-card p-4 space-y-4"
+              >
+                <div className="flex justify-between items-start pt-1">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
+                  <Skeleton className="h-4 w-14 rounded-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-lg" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            );
+          }
 
           return (
             <div
               key={section.key}
               onClick={() => setSelectedKey(isSelected ? null : section.key)}
               className={`group relative flex flex-col justify-between rounded-xl border bg-card p-4 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-lg ${
-                isSelected ? "ring-2 shadow-md" : "hover:border-foreground/30"
+                isSelected
+                  ? "ring-2 shadow-md"
+                  : "hover:border-foreground/30"
               }`}
               style={{
                 borderColor: isSelected ? section.color : `${section.color}40`,
-                boxShadow: isSelected
-                  ? `0 0 0 2px ${section.color}`
-                  : undefined,
+                boxShadow: isSelected ? `0 0 0 2px ${section.color}` : undefined,
               }}
             >
               {/* Top Accent Bar with section color */}
@@ -159,17 +196,26 @@ export function SectionsGrid() {
                   &ldquo;{section.motto}&rdquo;
                 </div>
 
-                {/* Member count & progress bar */}
-                <div className="space-y-1.5 pt-1">
+                {/* Live Member and Troop Counts */}
+                <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1">
-                      <Users className="h-3 w-3" /> Đoàn sinh
+                      <Users className="h-3 w-3" /> Đoàn sinh:
                     </span>
                     <span className="font-bold text-foreground">
-                      {stats.members}{" "}
+                      {liveStat.memberCount}{" "}
                       <span className="text-[10px] text-muted-foreground font-normal">
-                        ({stats.percentage}%)
+                        ({totalMembers > 0 ? `${liveStat.percentage}%` : "0%"})
                       </span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1">
+                      <Flag className="h-3 w-3" /> Số đoàn trực thuộc:
+                    </span>
+                    <span className="font-semibold text-foreground">
+                      {liveStat.troopCount} Đoàn
                     </span>
                   </div>
 
@@ -178,20 +224,30 @@ export function SectionsGrid() {
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
-                        width: `${stats.percentage * 2.5}%`,
+                        width:
+                          totalMembers > 0
+                            ? `${liveStat.percentage}%`
+                            : liveStat.troopCount > 0
+                              ? `${Math.min(100, liveStat.troopCount * 15)}%`
+                              : "0%",
                         backgroundColor: section.color,
                       }}
                     />
                   </div>
                 </div>
 
-                {/* Ranks badge summary */}
+                {/* Real Rankings from Database */}
                 <div className="space-y-1 pt-1">
-                  <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
-                    <Award className="h-3 w-3" /> Đẳng thứ tiêu biểu:
+                  <span className="text-[10px] font-medium text-muted-foreground flex items-center justify-between">
+                    <span className="flex items-center gap-1">
+                      <Award className="h-3 w-3" /> Đẳng thứ CSDL:
+                    </span>
+                    <span className="text-[10px] font-bold text-foreground">
+                      {liveStat.rankingCount || displayRankings.length} cấp
+                    </span>
                   </span>
                   <div className="flex flex-wrap gap-1">
-                    {section.rankings.slice(0, 2).map((rank) => (
+                    {displayRankings.slice(0, 3).map((rank) => (
                       <span
                         key={rank}
                         className="text-[10px] px-1.5 py-0.5 rounded bg-secondary/80 text-foreground/80 border border-border/50 truncate max-w-full"
@@ -211,7 +267,7 @@ export function SectionsGrid() {
                   size="sm"
                   className="w-full justify-between h-7 px-2 text-xs font-medium hover:bg-secondary"
                 >
-                  <Link href="/cms/members">
+                  <Link href={`/cms/troops`}>
                     <span>Xem danh sách</span>
                     <ChevronRight className="h-3.5 w-3.5 opacity-60 group-hover:translate-x-1 transition-transform" />
                   </Link>

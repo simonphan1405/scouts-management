@@ -1,14 +1,24 @@
 export const TABLE_TRANSLATIONS: Record<string, string> = {
   councils: "Châu",
+  council: "Châu",
   districts: "Đạo",
+  district: "Đạo",
   groups: "Liên đoàn",
+  group: "Liên đoàn",
   troops: "Đoàn",
+  troop: "Đoàn",
   units: "Đội",
+  unit: "Đội",
   sections: "Ngành",
+  section: "Ngành",
   rankings: "Đẳng thứ",
+  ranking: "Đẳng thứ",
   religions: "Tôn giáo",
+  religion: "Tôn giáo",
   expenses: "Chi phí",
+  expense: "Chi phí",
   members: "Thành viên",
+  member: "Thành viên",
 };
 
 export const FIELD_TRANSLATIONS: Record<string, string> = {

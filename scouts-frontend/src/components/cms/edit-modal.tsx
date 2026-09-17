@@ -14,6 +14,7 @@ import {
 import { RecordForm } from "./record-form";
 import { useUpdateRecord } from "@/hooks/use-update-record";
 import type { ColumnMeta } from "@/lib/graphql/types";
+import { translateTableName } from "@/lib/i18n";
 
 interface EditModalProps {
   tableName: string;
@@ -44,13 +45,18 @@ export function EditModal({ tableName, columns, row, onUpdated }: EditModalProps
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Edit ${tableName} record`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          aria-label={`Chỉnh sửa bản ghi ${translateTableName(tableName)}`}
+        >
           <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[90dvh] w-[calc(100vw-1.5rem)] flex flex-col p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Chỉnh sửa bản ghi: {tableName}</DialogTitle>
+          <DialogTitle>Chỉnh sửa bản ghi: {translateTableName(tableName)}</DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
           <RecordForm columns={columns} values={values} onChange={setValues} />

@@ -14,6 +14,7 @@ import {
 import { RecordForm } from "./record-form";
 import { useCreateRecord } from "@/hooks/use-create-record";
 import type { ColumnMeta } from "@/lib/graphql/types";
+import { translateTableName } from "@/lib/i18n";
 
 interface CreateModalProps {
   tableName: string;
@@ -40,12 +41,12 @@ export function CreateModal({ tableName, columns, onCreated }: CreateModalProps)
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2">
           <Plus className="h-4 w-4" aria-hidden="true" />
-          New Record
+          Thêm bản ghi
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[90dvh] w-[calc(100vw-1.5rem)] flex flex-col p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Tạo bản ghi mới: {tableName}</DialogTitle>
+          <DialogTitle>Tạo bản ghi mới: {translateTableName(tableName)}</DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
           <RecordForm columns={columns} values={values} onChange={setValues} />

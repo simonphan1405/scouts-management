@@ -6,7 +6,7 @@ import { useTableList } from "@/hooks/use-introspection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, Search, X } from "lucide-react";
 import { ScoutEmblem } from "@/components/ui/scout-emblem";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -15,6 +15,7 @@ import { resetApolloClient } from "@/lib/apollo/client";
 import { translateTableName } from "@/lib/i18n/cms";
 import { Separator } from "@/components/ui/separator";
 import type { TableMeta } from "@/lib/graphql/types";
+import { removeVietnameseTones } from "@/lib/utils/search-utils";
 
 const MIN_WIDTH = 180;
 const MAX_WIDTH = 480;
@@ -122,6 +123,23 @@ export function Sidebar() {
     return result;
   }, [tables]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredGroups = useMemo(() => {
+    if (!searchQuery.trim()) return groupedData;
+    const q = removeVietnameseTones(searchQuery.trim());
+    return groupedData
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((table) => {
+          const vnName = removeVietnameseTones(translateTableName(table.name));
+          const enName = removeVietnameseTones(table.name);
+          return vnName.includes(q) || enName.includes(q);
+        }),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [groupedData, searchQuery]);
+
   useEffect(() => {
     // Read from localStorage after initial render via rAF to avoid hydration mismatch
     const stored = getStoredWidth();
@@ -224,6 +242,31 @@ export function Sidebar() {
           </div>
 
           <Separator className="bg-border/40 my-2" />
+
+          {/* Table Search Input */}
+          {!loading ? (
+            <div className="relative mb-2.5">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm bảng..."
+                className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-border/40 bg-background/50 focus:outline-none focus:ring-1 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground/60 transition-all"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/40 transition-colors cursor-pointer"
+                  aria-label="Xóa tìm kiếm bảng"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
           {loading ? (
             <div className="space-y-3">
               <div className="space-y-1.5">
@@ -262,9 +305,14 @@ export function Sidebar() {
                 </div>
               </div>
             </div>
+          ) : filteredGroups.length === 0 && searchQuery ? (
+            <div className="py-6 text-center text-xs text-muted-foreground font-medium">
+              Không tìm thấy bảng nào
+            </div>
           ) : (
-            groupedData.map((group, groupIndex) => {
+            filteredGroups.map((group, groupIndex) => {
               const isOpen =
+                Boolean(searchQuery) ||
                 (Boolean(currentTable) &&
                   group.items.some(
                     (item) => item.name.toLowerCase() === currentTable,

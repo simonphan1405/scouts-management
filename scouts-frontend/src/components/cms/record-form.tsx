@@ -70,10 +70,17 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
                 id={col.name}
                 name={col.name}
                 collectionField={col.relationTo}
+                colType={col.type}
                 value={String(values[col.name] ?? "")}
                 nullable={col.nullable}
                 placeholder={translateField(col.name)}
-                onChange={(val) => handleChange(col.name, val)}
+                onChange={(val) => {
+                  const finalVal =
+                    (col.type === "BigInt" || col.type === "Int") && val != null && val !== ""
+                      ? Number(val)
+                      : val;
+                  handleChange(col.name, finalVal);
+                }}
               />
             ) : inputType === "checkbox" ? (
               <div className="flex items-center h-9">

@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Protect /cms routes — redirect to /login if not authenticated
-  if (!user && pathname.startsWith("/cms")) {
+  if (!user && pathname.startsWith("/portal")) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     return NextResponse.redirect(loginUrl);
@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
   // If authenticated and on /login, redirect to /cms
   if (user && pathname === "/login") {
     const cmsUrl = request.nextUrl.clone();
-    cmsUrl.pathname = "/cms";
+    cmsUrl.pathname = "/portal";
     return NextResponse.redirect(cmsUrl);
   }
 

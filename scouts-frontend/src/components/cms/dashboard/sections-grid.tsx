@@ -77,7 +77,7 @@ export function SectionsGrid({
             size="sm"
             className="text-xs h-8 text-primary hover:text-primary hover:bg-primary/10"
           >
-            <Link href="/cms/sections">
+            <Link href="/portal/sections">
               Quản lý danh mục Ngành
               <ChevronRight className="h-3.5 w-3.5 ml-1" />
             </Link>
@@ -272,7 +272,7 @@ export function SectionsGrid({
                   size="sm"
                   className="w-full justify-between h-7 px-2 text-xs font-medium hover:bg-secondary"
                 >
-                  <Link href={`/cms/troops`}>
+                  <Link href={`/portal/troops`}>
                     <span>Xem danh sách</span>
                     <ChevronRight className="h-3.5 w-3.5 opacity-60 group-hover:translate-x-1 transition-transform" />
                   </Link>

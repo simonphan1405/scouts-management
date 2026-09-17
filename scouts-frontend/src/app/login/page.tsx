@@ -40,7 +40,7 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#120D26] via-background to-[#170E2B] mesh-bg px-4 py-12 relative overflow-hidden select-none">
+    <div className="min-h-dvh flex items-center justify-center bg-gradient-to-br from-[#120D26] via-background to-[#170E2B] mesh-bg px-4 py-8 sm:py-12 relative overflow-hidden select-none">
       {/* Ambient decorative glowing orbs matching Scout palette */}
       <div className="absolute top-1/4 left-1/5 w-80 h-80 bg-[#7D58D9]/20 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/5 w-80 h-80 bg-[#EDB55E]/15 rounded-full blur-[120px] pointer-events-none" />
@@ -48,11 +48,11 @@ export default function LoginPage() {
 
       {/* Main Login Card */}
       <div className="w-full max-w-md relative z-10 glass rounded-3xl border border-border/50 shadow-2xl overflow-hidden animate-fade-in-up">
-        <div className="p-8 sm:p-10 space-y-6">
+        <div className="p-6 sm:p-10 space-y-5 sm:space-y-6">
           {/* Header & Scout Emblem */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-[#7D58D9]/20 via-[#EDB55E]/15 to-[#5CB856]/15 border border-[#7D58D9]/30 shadow-md shadow-[#7D58D9]/10 group transition-transform hover:scale-105">
-              <ScoutEmblem className="h-12 w-12 drop-shadow-sm" />
+          <div className="text-center space-y-2.5 sm:space-y-3">
+            <div className="inline-flex items-center justify-center p-2.5 sm:p-3 rounded-2xl bg-gradient-to-br from-[#7D58D9]/20 via-[#EDB55E]/15 to-[#5CB856]/15 border border-[#7D58D9]/30 shadow-md shadow-[#7D58D9]/10 group transition-transform hover:scale-105">
+              <ScoutEmblem className="h-10 w-10 sm:h-12 sm:w-12 drop-shadow-sm" />
             </div>
 
             <div className="space-y-1">

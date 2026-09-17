@@ -95,11 +95,11 @@ export function KpiStats({
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border/40 bg-card p-5 space-y-4"
+            className="rounded-xl border border-border/40 bg-card p-4 sm:p-5 space-y-4"
           >
             <div className="flex justify-between items-start">
               <Skeleton className="h-10 w-10 rounded-xl" />
@@ -117,14 +117,14 @@ export function KpiStats({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {stats.map((item) => {
         const Icon = item.icon;
         return (
           <Link
             key={item.title}
             href={item.href}
-            className={`group relative overflow-hidden rounded-xl border ${item.borderColor} bg-card p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md`}
+            className={`group relative overflow-hidden rounded-xl border ${item.borderColor} bg-card p-4 sm:p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md`}
           >
             {/* Top right gradient accent */}
             <div

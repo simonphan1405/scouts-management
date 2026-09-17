@@ -264,7 +264,7 @@ export function DataTable({ tableName }: DataTableProps) {
                       </span>
                       <div
                         onMouseDown={(e) => handleResizeStart(e, colIndex)}
-                        className="absolute top-0 right-0 w-0.75 h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
+                        className="hidden md:block absolute top-0 right-0 w-0.75 h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
                         style={{ touchAction: "none" }}
                         aria-hidden="true"
                       />
@@ -373,16 +373,18 @@ export function DataTable({ tableName }: DataTableProps) {
 
       {/* Pagination controls */}
       {!loading && filteredCount > 0 ? (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 mt-4 glass rounded-xl border border-border/40">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 mt-4 glass rounded-xl border border-border/40">
           {/* Page size selector & item range */}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground font-medium">
+          <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground font-medium">
             <div className="flex items-center gap-2">
-              <label htmlFor="page-size-select">Số hàng mỗi trang</label>
+              <label htmlFor="page-size-select" className="text-xs">
+                Số hàng
+              </label>
               <select
                 id="page-size-select"
                 value={pageSize}
                 onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                className="h-8.5 rounded-lg border border-border/50 bg-background/50 px-2.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer transition-all hover:bg-background"
+                className="h-8.5 rounded-lg border border-border/50 bg-background/50 px-2 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer transition-all hover:bg-background"
               >
                 {PAGE_SIZE_OPTIONS.map((size) => (
                   <option key={size} value={size}>
@@ -392,64 +394,66 @@ export function DataTable({ tableName }: DataTableProps) {
               </select>
             </div>
 
-            <span className="text-xs text-muted-foreground">
-              Hiển thị <strong className="text-foreground">{fromRecord}</strong>{" "}
-              - <strong className="text-foreground">{toRecord}</strong> trên{" "}
+            <span className="text-[11px] sm:text-xs text-muted-foreground">
+              <strong className="text-foreground">{fromRecord}</strong> -{" "}
+              <strong className="text-foreground">{toRecord}</strong> /{" "}
               <strong className="text-foreground">{filteredCount}</strong> kết
               quả
             </span>
           </div>
 
           {/* Page info & navigation */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-foreground/80 mr-2">
+          <div className="flex items-center justify-between sm:justify-end gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/30">
+            <span className="text-xs font-medium text-foreground/80 mr-1 sm:mr-2">
               Trang {safeCurrentPage + 1} / {totalPages}
             </span>
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8.5 w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
-              onClick={goToFirstPage}
-              disabled={!hasPrevPage}
-              aria-label="Về trang đầu"
-              title="Về trang đầu"
-            >
-              <ChevronsLeft className="h-4 w-4" aria-hidden="true" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8.5 w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
-              onClick={goToPrevPage}
-              disabled={!hasPrevPage}
-              aria-label="Trang trước"
-              title="Trang trước"
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8.5 w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
-              onClick={goToNextPage}
-              disabled={!hasNextPage}
-              aria-label="Trang tiếp theo"
-              title="Trang tiếp theo"
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8.5 w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
-              onClick={goToLastPage}
-              disabled={!hasNextPage}
-              aria-label="Đến trang cuối"
-              title="Đến trang cuối"
-            >
-              <ChevronsRight className="h-4 w-4" aria-hidden="true" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 sm:h-8.5 sm:w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
+                onClick={goToFirstPage}
+                disabled={!hasPrevPage}
+                aria-label="Về trang đầu"
+                title="Về trang đầu"
+              >
+                <ChevronsLeft className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 sm:h-8.5 sm:w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
+                onClick={goToPrevPage}
+                disabled={!hasPrevPage}
+                aria-label="Trang trước"
+                title="Trang trước"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 sm:h-8.5 sm:w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
+                onClick={goToNextPage}
+                disabled={!hasNextPage}
+                aria-label="Trang tiếp theo"
+                title="Trang tiếp theo"
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 sm:h-8.5 sm:w-8.5 rounded-lg border-border/50 bg-background/50 hover:bg-background backdrop-blur-sm cursor-pointer"
+                onClick={goToLastPage}
+                disabled={!hasNextPage}
+                aria-label="Đến trang cuối"
+                title="Đến trang cuối"
+              >
+                <ChevronsRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </div>
           </div>
         </div>
       ) : null}

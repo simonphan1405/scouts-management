@@ -43,19 +43,19 @@ export function CreateModal({ tableName, columns, onCreated }: CreateModalProps)
           New Record
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
+      <DialogContent className="sm:max-w-2xl max-h-[90dvh] w-[calc(100vw-1.5rem)] flex flex-col p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Create {tableName} Record</DialogTitle>
+          <DialogTitle>Tạo bản ghi mới: {tableName}</DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
           <RecordForm columns={columns} values={values} onChange={setValues} />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 pt-2">
+          <Button variant="outline" onClick={handleCancel} className="w-full sm:w-auto">
+            Hủy
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Creating…" : "Create Record"}
+          <Button onClick={handleSubmit} disabled={loading} className="w-full sm:w-auto">
+            {loading ? "Đang tạo…" : "Tạo bản ghi"}
           </Button>
         </DialogFooter>
       </DialogContent>

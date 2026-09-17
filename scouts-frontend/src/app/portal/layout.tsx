@@ -8,6 +8,7 @@ import {
   MAX_WIDTH,
 } from "@/components/cms/sidebar";
 import { useEffect, useState } from "react";
+import { MobileNavProvider, MobileHeader } from "@/components/cms/mobile-nav";
 
 function getInitialSidebarWidth(): number {
   if (typeof window === "undefined") return DEFAULT_WIDTH;
@@ -22,6 +23,14 @@ function getInitialSidebarWidth(): number {
 export default function CmsLayout({ children }: { children: React.ReactNode }) {
   // Initialize with DEFAULT_WIDTH to match SSR and avoid hydration mismatch
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_WIDTH);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Subscribe to sidebar resize via ResizeObserver (external system — useEffect is correct here)
   useEffect(() => {
@@ -47,14 +56,19 @@ export default function CmsLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main
-        className="flex-1 p-6 overflow-auto"
-        style={{ marginLeft: sidebarWidth }}
-      >
-        {children}
-      </main>
-    </div>
+    <MobileNavProvider>
+      <div className="flex flex-col md:flex-row min-h-screen bg-background">
+        <Sidebar />
+        <div
+          className="flex-1 flex flex-col min-w-0 transition-[margin] duration-300 ease-out"
+          style={{ marginLeft: isMobile ? 0 : sidebarWidth }}
+        >
+          <MobileHeader />
+          <main className="flex-1 p-3.5 sm:p-5 md:p-6 overflow-x-hidden min-w-0">
+            {children}
+          </main>
+        </div>
+      </div>
+    </MobileNavProvider>
   );
 }

@@ -7,19 +7,19 @@ import { ScoutEmblem } from "@/components/ui/scout-emblem";
 
 export function DashboardHero() {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-card via-card/80 to-accent/20 p-6 md:p-8 shadow-sm">
+    <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-card via-card/80 to-accent/20 p-4 sm:p-6 md:p-8 shadow-sm">
       {/* Background ambient decorative glow */}
       <div className="absolute -right-16 -top-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute right-1/4 -bottom-16 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2.5 max-w-2xl">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-              <ScoutEmblem className="h-4 w-4" />
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+        <div className="space-y-2 sm:space-y-2.5 max-w-2xl">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+              <ScoutEmblem className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Scouts Management
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-medium bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
               <Sparkles className="h-3 w-3" />
               Châm ngôn: Sắp Sẵn
             </span>
@@ -28,10 +28,10 @@ export function DashboardHero() {
             </span>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
             Bảng Điều Hành Hướng Đạo
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Hệ thống quản lý thống nhất các Ngành sinh hoạt (Nhi, Ấu, Thiếu,
             Kha, Tráng), tổ chức đơn vị từ Châu, Đạo đến Đội, cùng cơ sở dữ liệu
             đoàn sinh và kinh phí.
@@ -39,11 +39,11 @@ export function DashboardHero() {
         </div>
 
         {/* Action Shortcuts */}
-        <div className="flex flex-wrap md:flex-col lg:flex-row gap-2.5 shrink-0">
+        <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
           <Button
             asChild
             size="sm"
-            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs"
+            className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs w-full sm:w-auto justify-center"
           >
             <Link href="/portal/members">
               <UserPlus className="h-4 w-4" />
@@ -54,7 +54,7 @@ export function DashboardHero() {
             asChild
             variant="outline"
             size="sm"
-            className="gap-2 border-border/70 hover:bg-accent/40"
+            className="gap-2 border-border/70 hover:bg-accent/40 w-full sm:w-auto justify-center"
           >
             <Link href="/portal/sections">
               <FileSpreadsheet className="h-4 w-4" />5 Ngành Sinh Hoạt

@@ -109,10 +109,10 @@ export function QuickActions({
   ];
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-xs space-y-4">
+    <div className="rounded-2xl border border-border/60 bg-card p-4 sm:p-6 shadow-xs space-y-4">
       <div className="flex items-center justify-between border-b border-border/40 pb-3">
         <div>
-          <h3 className="font-bold text-base text-foreground">
+          <h3 className="font-bold text-sm sm:text-base text-foreground">
             Truy Cập Nhanh Cơ Sở Dữ Liệu
           </h3>
           <p className="text-xs text-muted-foreground">
@@ -121,7 +121,7 @@ export function QuickActions({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-2.5">
         {quickLinks.map((item) => {
           const Icon = item.icon;
           return (

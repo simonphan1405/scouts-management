@@ -92,10 +92,10 @@ export function OrgHierarchyCard({
   ];
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-xs space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/40 pb-4">
+    <div className="rounded-2xl border border-border/60 bg-card p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/40 pb-3 sm:pb-4">
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
             <span>Sơ Đồ Hệ Thống Tổ Chức Hướng Đạo</span>
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -112,7 +112,7 @@ export function OrgHierarchyCard({
 
       {/* Horizontal Flow Hierarchy */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {levels.map((lvl, index) => {
+        {levels.map((lvl) => {
           const Icon = lvl.icon;
           return (
             <div key={lvl.table} className="relative group">

@@ -139,10 +139,10 @@ export function TableFilters({
 
   return (
     <div className="space-y-3 mb-4">
-      {/* Top Toolbar: Search Bar + Quick Filters + Toggle Advanced Filters */}
-      <div className="flex flex-wrap items-center gap-2.5">
+      {/* Top Toolbar: Search Bar + Filter Buttons */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {/* Universal Search Input */}
-        <div className="relative flex-1 min-w-55">
+        <div className="relative flex-1 min-w-0">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none"
             aria-hidden="true"
@@ -153,7 +153,7 @@ export function TableFilters({
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={`Tìm kiếm trong bảng ${translateTableName(tableName)}...`}
-            className="pl-9 pr-8 h-9.5 bg-card/60 backdrop-blur-sm border-border/50 text-sm focus-visible:ring-primary/40 transition-all placeholder:text-muted-foreground/70"
+            className="pl-9 pr-8 h-10 sm:h-9.5 bg-card/60 backdrop-blur-sm border-border/50 text-sm focus-visible:ring-primary/40 transition-all placeholder:text-muted-foreground/70 w-full"
           />
           {searchTerm ? (
             <button
@@ -167,78 +167,85 @@ export function TableFilters({
           ) : null}
         </div>
 
-        {/* Quick Filter Selects */}
-        {quickFilterColumns.map((col) => {
-          const options = columnOptionsMap[col.name] ?? [];
-          if (options.length === 0) return null;
-
-          const currentValue = columnFilters[col.name] ?? "";
-
-          return (
-            <div
-              key={col.name}
-              className="relative shrink-0 min-w-32.5 max-w-47.5"
-            >
-              <select
-                value={currentValue}
-                onChange={(e) => onFilterChange(col.name, e.target.value)}
-                className={cn(
-                  "w-full h-9.5 rounded-lg border bg-card/60 backdrop-blur-sm px-2.5 pr-7 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition-all hover:bg-card truncate appearance-none",
-                  currentValue
-                    ? "border-primary/50 text-primary font-semibold bg-primary/5"
-                    : "border-border/50 text-foreground/80",
-                )}
-                aria-label={`Lọc theo ${translateField(col.name)}`}
-              >
-                <option value="">-- {translateField(col.name)} --</option>
-                {options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-            </div>
-          );
-        })}
-
-        {/* Filter Panel Toggle Button */}
-        <Button
-          type="button"
-          variant={activeFiltersList.length > 0 ? "default" : "outline"}
-          size="sm"
-          onClick={() => setShowFilterPanel((prev) => !prev)}
-          className={cn(
-            "h-9.5 shrink-0 gap-1.5 px-3 rounded-lg text-xs font-semibold border-border/50 transition-all cursor-pointer",
-            activeFiltersList.length > 0
-              ? "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90"
-              : "bg-card/60 backdrop-blur-sm hover:bg-card",
-          )}
-        >
-          <Filter className="h-3.5 w-3.5" />
-          <span>Bộ lọc</span>
-          {activeFiltersList.length > 0 ? (
-            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-primary-foreground/20 text-[10px] font-bold">
-              {activeFiltersList.length}
-            </span>
-          ) : null}
-        </Button>
-
-        {/* Reset / Clear all filters button */}
-        {activeCount > 0 ? (
+        {/* Filter Action Buttons */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Filter Panel Toggle Button */}
           <Button
             type="button"
-            variant="ghost"
+            variant={activeFiltersList.length > 0 ? "default" : "outline"}
             size="sm"
-            onClick={onClearFilters}
-            className="h-9.5 shrink-0 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            title="Xóa tất cả bộ lọc"
+            onClick={() => setShowFilterPanel((prev) => !prev)}
+            className={cn(
+              "h-10 sm:h-9.5 flex-1 sm:flex-initial gap-1.5 px-3 rounded-lg text-xs font-semibold border-border/50 transition-all cursor-pointer",
+              activeFiltersList.length > 0
+                ? "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90"
+                : "bg-card/60 backdrop-blur-sm hover:bg-card",
+            )}
           >
-            <RotateCcw className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Đặt lại</span>
+            <Filter className="h-3.5 w-3.5" />
+            <span>Bộ lọc</span>
+            {activeFiltersList.length > 0 ? (
+              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-primary-foreground/20 text-[10px] font-bold">
+                {activeFiltersList.length}
+              </span>
+            ) : null}
           </Button>
-        ) : null}
+
+          {/* Reset / Clear all filters button */}
+          {activeCount > 0 ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onClearFilters}
+              className="h-10 sm:h-9.5 shrink-0 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              title="Xóa tất cả bộ lọc"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span className="inline">Đặt lại</span>
+            </Button>
+          ) : null}
+        </div>
       </div>
+
+      {/* Quick Filter Selects - Scrollable on mobile */}
+      {quickFilterColumns.length > 0 ? (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 -mx-1 px-1 sm:mx-0 sm:px-0 sm:flex-wrap">
+          {quickFilterColumns.map((col) => {
+            const options = columnOptionsMap[col.name] ?? [];
+            if (options.length === 0) return null;
+
+            const currentValue = columnFilters[col.name] ?? "";
+
+            return (
+              <div
+                key={col.name}
+                className="relative shrink-0 min-w-32 max-w-48 sm:min-w-34"
+              >
+                <select
+                  value={currentValue}
+                  onChange={(e) => onFilterChange(col.name, e.target.value)}
+                  className={cn(
+                    "w-full h-8.5 rounded-lg border bg-card/60 backdrop-blur-sm px-2.5 pr-7 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition-all hover:bg-card truncate appearance-none",
+                    currentValue
+                      ? "border-primary/50 text-primary font-semibold bg-primary/5"
+                      : "border-border/50 text-foreground/80",
+                  )}
+                  aria-label={`Lọc theo ${translateField(col.name)}`}
+                >
+                  <option value="">-- {translateField(col.name)} --</option>
+                  {options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
 
       {/* Expandable Advanced Column Filter Panel */}
       {showFilterPanel ? (
@@ -303,7 +310,7 @@ export function TableFilters({
       ) : null}
 
       {/* Active Filter Badges & Results Counter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-0.5">
         <div className="flex flex-wrap items-center gap-1.5">
           {searchTerm ? (
             <Badge
@@ -320,7 +327,7 @@ export function TableFilters({
                 type="button"
                 onClick={() => onSearchChange("")}
                 className="rounded-full p-0.5 hover:bg-primary/20 transition-colors cursor-pointer"
-                aria-label="Xóa bộ lọc tìm kiếm"
+                aria-label="Xóa từ khóa tìm kiếm"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -371,7 +378,7 @@ export function TableFilters({
         </div>
 
         {/* Results Counter */}
-        <div className="text-xs text-muted-foreground font-medium ml-auto">
+        <div className="text-xs text-muted-foreground font-medium self-end sm:self-auto">
           {activeCount > 0 ? (
             <span>
               Tìm thấy{" "}

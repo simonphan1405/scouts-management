@@ -16,6 +16,7 @@ import { translateTableName } from "@/lib/i18n/cms";
 import { Separator } from "@/components/ui/separator";
 import type { TableMeta } from "@/lib/graphql/types";
 import { removeVietnameseTones } from "@/lib/utils/search-utils";
+import { useMobileNav } from "./mobile-nav";
 
 const MIN_WIDTH = 180;
 const MAX_WIDTH = 480;
@@ -60,6 +61,16 @@ export function Sidebar() {
   const { tables, loading } = useTableList();
   const pathname = usePathname();
   const router = useRouter();
+  const { isOpen: isMobileOpen, close: closeMobileNav } = useMobileNav();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   // Initialize with DEFAULT_WIDTH to match SSR and avoid hydration mismatch
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const isDragging = useRef(false);
@@ -194,52 +205,84 @@ export function Sidebar() {
   const isDashboardActive = pathname === "/portal";
 
   return (
-    <aside
-      className="shrink-0 border-r border-border/40 bg-card/60 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 select-none transition-[width] duration-300 ease-out z-40"
-      style={{ width }}
-    >
-      {/* Top Brand Header with Scouts Management */}
-      <Link
-        href="/portal"
-        className="flex items-center gap-3 px-5 py-4 border-b border-border/40 hover:bg-accent/40 transition-colors group"
-      >
-        <div className="shrink-0 group-hover:scale-105 transition-transform">
-          <ScoutEmblem className="h-8 w-8 drop-shadow-xs" />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="font-bold tracking-tight text-foreground/90 text-sm truncate">
-            Scouts Management
-          </span>
-          <span className="text-[11px] font-medium text-muted-foreground truncate">
-            Quản Lý Hướng Đạo
-          </span>
-        </div>
-      </Link>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      <div
+        className={cn(
+          "fixed inset-0 bg-background/80 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300",
+          isMobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none",
+        )}
+        onClick={closeMobileNav}
+        aria-hidden="true"
+      />
 
-      {/* Quick Color Palette Accent Strip */}
-      <ScrollArea className="flex-1">
-        <nav className="p-3">
-          {/* Top Overview / Dashboard Link */}
-          <div className="mb-2">
-            <Link
-              href="/portal"
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 relative group",
-                isDashboardActive
-                  ? "bg-primary/10 text-primary font-semibold shadow-xs"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
-              )}
-            >
-              {isDashboardActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/5 bg-primary rounded-r-full" />
-              )}
-              <LayoutDashboard className="h-4 w-4 shrink-0 text-primary" />
-              <span className="truncate">Tổng quan</span>
-              <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
-                Live
+      <aside
+        className={cn(
+          "shrink-0 border-r border-border/40 bg-card/95 md:bg-card/60 backdrop-blur-xl flex flex-col h-dvh md:h-screen fixed left-0 top-0 select-none z-50 md:z-40 transition-transform md:transition-[width] duration-300 ease-out",
+          "w-[280px] sm:w-[300px] md:w-auto",
+          isMobileOpen
+            ? "translate-x-0 shadow-2xl"
+            : "-translate-x-full md:translate-x-0",
+        )}
+        style={{ width: isMobile ? undefined : width }}
+      >
+        {/* Top Brand Header with Scouts Management */}
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-border/40">
+          <Link
+            href="/portal"
+            onClick={closeMobileNav}
+            className="flex items-center gap-3 hover:bg-accent/40 rounded-lg p-1 transition-colors group flex-1 min-w-0"
+          >
+            <div className="shrink-0 group-hover:scale-105 transition-transform">
+              <ScoutEmblem className="h-8 w-8 drop-shadow-xs" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold tracking-tight text-foreground/90 text-sm truncate">
+                Scouts Management
               </span>
-            </Link>
-          </div>
+              <span className="text-[11px] font-medium text-muted-foreground truncate">
+                Quản Lý Hướng Đạo
+              </span>
+            </div>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg md:hidden text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+            onClick={closeMobileNav}
+            aria-label="Đóng menu"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Quick Color Palette Accent Strip */}
+        <ScrollArea className="flex-1">
+          <nav className="p-3">
+            {/* Top Overview / Dashboard Link */}
+            <div className="mb-2">
+              <Link
+                href="/portal"
+                onClick={closeMobileNav}
+                className={cn(
+                  "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 relative group",
+                  isDashboardActive
+                    ? "bg-primary/10 text-primary font-semibold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+                )}
+              >
+                {isDashboardActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/5 bg-primary rounded-r-full" />
+                )}
+                <LayoutDashboard className="h-4 w-4 shrink-0 text-primary" />
+                <span className="truncate">Tổng quan</span>
+                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-medium">
+                  Live
+                </span>
+              </Link>
+            </div>
 
           <Separator className="bg-border/40 my-2" />
 
@@ -353,6 +396,7 @@ export function Sidebar() {
                             <Link
                               key={table.name}
                               href={href}
+                              onClick={closeMobileNav}
                               className={cn(
                                 "flex items-center px-4 py-2 rounded-lg text-sm capitalize transition-all duration-200 relative group overflow-hidden",
                                 isActive
@@ -393,14 +437,15 @@ export function Sidebar() {
         </Button>
       </div>
 
-      {/* Drag handle */}
+      {/* Drag handle - desktop only */}
       <div
         onMouseDown={handleMouseDown}
-        className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize group z-50 hover:bg-primary/50"
+        className="hidden md:block absolute top-0 right-0 w-1.5 h-full cursor-col-resize group z-50 hover:bg-primary/50"
       >
         <div className="absolute right-0 top-0 h-full w-px bg-border/40 group-hover:bg-primary transition-colors" />
       </div>
     </aside>
+  </>
   );
 }
 

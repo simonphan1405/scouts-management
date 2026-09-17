@@ -21,6 +21,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft } from "lucide-react";
 import { translateField } from "@/lib/i18n";
+import { useRelationMap } from "@/hooks/use-relation-map";
 
 interface DataTableProps {
   tableName: string;
@@ -59,6 +60,10 @@ export function DataTable({ tableName }: DataTableProps) {
   } = useTableData(collectionField, columns, pagination);
 
   const loading = schemaLoading || (dataLoading && rows.length === 0);
+
+  // ---- Relation label maps for FK columns ----
+  const { relationMaps } = useRelationMap(columns);
+
 
   // Reset pagination when table changes (derived from prop — intentional setState in effect)
   useEffect(() => {
@@ -244,22 +249,34 @@ export function DataTable({ tableName }: DataTableProps) {
                   key={String(row.id ?? idx)}
                   className="hover:bg-accent/40 border-b-border/20 transition-colors"
                 >
-                  {columns.map((col) => (
-                    <TableCell
-                      key={col.name}
-                      className="text-sm truncate overflow-hidden py-3"
-                    >
-                      {row[col.name] == null ? (
-                        <span className="text-muted-foreground/60 italic text-xs">
-                          null
-                        </span>
-                      ) : (
-                        <span className="font-medium text-foreground/90">
-                          {String(row[col.name])}
-                        </span>
-                      )}
-                    </TableCell>
-                  ))}
+                  {columns.map((col) => {
+                    const rawValue = row[col.name];
+                    // Resolve FK id → label if a relation map exists for this column
+                    const relMap = relationMaps[col.name];
+                    const displayValue =
+                      relMap && rawValue != null
+                        ? (relMap.get(String(rawValue)) ?? String(rawValue))
+                        : rawValue != null
+                          ? String(rawValue)
+                          : null;
+                    return (
+                      <TableCell
+                        key={col.name}
+                        className="text-sm truncate overflow-hidden py-3"
+                      >
+                        {displayValue == null ? (
+                          <span className="text-muted-foreground/60 italic text-xs">
+                            null
+                          </span>
+                        ) : (
+                          <span className="font-medium text-foreground/90">
+                            {displayValue}
+                          </span>
+                        )}
+                      </TableCell>
+                    );
+                  })}
+
                   <TableCell className="py-3">
                     <RowActions
                       tableName={tableName}

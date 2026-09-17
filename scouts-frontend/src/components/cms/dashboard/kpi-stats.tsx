@@ -47,7 +47,7 @@ export function KpiStats({
       color: "#7D58D9",
       bgGradient: "from-[#7D58D9]/10 to-[#7D58D9]/5",
       borderColor: "border-[#7D58D9]/20",
-      href: "/cms/members",
+      href: "/portal/members",
     },
     {
       title: "5 Ngành Hướng Đạo",
@@ -59,7 +59,7 @@ export function KpiStats({
       color: "#5CB856",
       bgGradient: "from-[#5CB856]/10 to-[#5CB856]/5",
       borderColor: "border-[#5CB856]/20",
-      href: "/cms/sections",
+      href: "/portal/sections",
     },
     {
       title: "Đơn Vị Sinh Hoạt Cơ Sở",
@@ -71,7 +71,7 @@ export function KpiStats({
       color: "#EDB55E",
       bgGradient: "from-[#EDB55E]/15 to-[#EDB55E]/5",
       borderColor: "border-[#EDB55E]/25",
-      href: "/cms/troops",
+      href: "/portal/troops",
     },
     {
       title: "Kinh Phí & Ngân Sách",
@@ -89,7 +89,7 @@ export function KpiStats({
       color: "#E01205",
       bgGradient: "from-[#E01205]/10 to-[#E01205]/5",
       borderColor: "border-[#E01205]/20",
-      href: "/cms/expenses",
+      href: "/portal/expenses",
     },
   ];
 

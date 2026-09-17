@@ -43,7 +43,7 @@ export function OrgHierarchyCard({
       count: `${unitCounts.councils} Châu`,
       icon: Globe2,
       color: "#7D58D9",
-      href: "/cms/councils",
+      href: "/portal/councils",
     },
     {
       level: "Cấp 2",
@@ -54,7 +54,7 @@ export function OrgHierarchyCard({
       count: `${unitCounts.districts} Đạo`,
       icon: MapPin,
       color: "#5CB856",
-      href: "/cms/districts",
+      href: "/portal/districts",
     },
     {
       level: "Cấp 3",
@@ -65,7 +65,7 @@ export function OrgHierarchyCard({
       count: `${unitCounts.groups} Liên đoàn`,
       icon: Building,
       color: "#EDB55E",
-      href: "/cms/groups",
+      href: "/portal/groups",
     },
     {
       level: "Cấp 4",
@@ -76,7 +76,7 @@ export function OrgHierarchyCard({
       count: `${unitCounts.troops} Đoàn`,
       icon: Flag,
       color: "#881337",
-      href: "/cms/troops",
+      href: "/portal/troops",
     },
     {
       level: "Cấp 5",
@@ -87,7 +87,7 @@ export function OrgHierarchyCard({
       count: `${unitCounts.units} Đội`,
       icon: Users2,
       color: "#E01205",
-      href: "/cms/units",
+      href: "/portal/units",
     },
   ];
 

@@ -82,7 +82,7 @@ export function Sidebar() {
     if (!pathname) return "";
     return (
       pathname
-        .replace(/^\/cms\//, "")
+        .replace(/^\/portal\//, "")
         .split("/")[0]
         ?.toLowerCase() ?? ""
     );
@@ -173,7 +173,7 @@ export function Sidebar() {
     };
   }, []);
 
-  const isDashboardActive = pathname === "/cms";
+  const isDashboardActive = pathname === "/portal";
 
   return (
     <aside
@@ -182,7 +182,7 @@ export function Sidebar() {
     >
       {/* Top Brand Header with Scouts Management */}
       <Link
-        href="/cms"
+        href="/portal"
         className="flex items-center gap-3 px-5 py-4 border-b border-border/40 hover:bg-accent/40 transition-colors group"
       >
         <div className="shrink-0 group-hover:scale-105 transition-transform">
@@ -204,7 +204,7 @@ export function Sidebar() {
           {/* Top Overview / Dashboard Link */}
           <div className="mb-2">
             <Link
-              href="/cms"
+              href="/portal"
               className={cn(
                 "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 relative group",
                 isDashboardActive
@@ -299,7 +299,7 @@ export function Sidebar() {
                     >
                       <div className="overflow-hidden space-y-0.5">
                         {group.items.map((table) => {
-                          const href = `/cms/${table.name}`;
+                          const href = `/portal/${table.name}`;
                           const isActive = pathname === href;
                           return (
                             <Link

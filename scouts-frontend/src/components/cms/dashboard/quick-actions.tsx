@@ -127,7 +127,7 @@ export function QuickActions({
           return (
             <Link
               key={item.name}
-              href={`/cms/${item.name}`}
+              href={`/portal/${item.name}`}
               className="group flex flex-col justify-between p-3 rounded-xl border border-border/50 bg-secondary/15 hover:bg-accent/40 hover:border-border transition-all duration-150"
             >
               <div className="flex items-start justify-between">

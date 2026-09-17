@@ -45,7 +45,7 @@ export function DashboardHero() {
             size="sm"
             className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs"
           >
-            <Link href="/cms/members">
+            <Link href="/portal/members">
               <UserPlus className="h-4 w-4" />
               Quản lý Đoàn sinh
             </Link>
@@ -56,7 +56,7 @@ export function DashboardHero() {
             size="sm"
             className="gap-2 border-border/70 hover:bg-accent/40"
           >
-            <Link href="/cms/sections">
+            <Link href="/portal/sections">
               <FileSpreadsheet className="h-4 w-4" />5 Ngành Sinh Hoạt
             </Link>
           </Button>

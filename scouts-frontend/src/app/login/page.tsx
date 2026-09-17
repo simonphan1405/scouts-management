@@ -33,7 +33,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/cms");
+      router.push("/portal");
       router.refresh();
     },
     [email, password, router],

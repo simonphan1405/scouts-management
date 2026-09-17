@@ -8,7 +8,6 @@ import {
 } from "@/lib/constants/scout-theme";
 import {
   Compass,
-  ShieldCheck,
   ChevronRight,
   Award,
   Users,
@@ -20,6 +19,7 @@ import { BeaverIcon } from "@/components/ui/beaver-icon";
 import { WolfIcon } from "@/components/ui/wolf-icon";
 import { ScoutEmblem } from "@/components/ui/scout-emblem";
 import { KhaEmblem } from "@/components/ui/kha-emblem";
+import { RoverThumbstickIcon } from "@/components/ui/rover-thumbstick-icon";
 
 function ThieuScoutEmblem(props: React.ComponentProps<typeof ScoutEmblem>) {
   return <ScoutEmblem color="currentColor" petalFill="none" {...props} />;
@@ -31,7 +31,7 @@ const SECTION_ICONS = {
   au: WolfIcon, // Con sói (Cub Scouts / Wolf)
   thieu: ThieuScoutEmblem, // Hoa Bách Hợp (Scout Emblem)
   kha: KhaEmblem, // Huy hiệu Ngành Kha (Khai Phá)
-  trang: ShieldCheck, // Phụng sự / Giúp ích
+  trang: RoverThumbstickIcon, // Gậy Tráng Sinh (Rover Thumbstick - Giúp ích)
 };
 
 export interface SectionLiveStats {

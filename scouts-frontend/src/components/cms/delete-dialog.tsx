@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useDeleteRecord } from "@/hooks/use-delete-record";
+import { translateTableName } from "@/lib/i18n";
 
 interface DeleteDialogProps {
   tableName: string;
@@ -39,27 +40,27 @@ export function DeleteDialog({ tableName, recordId, onDeleted }: DeleteDialogPro
           variant="ghost"
           size="icon"
           className="h-7 w-7 text-destructive hover:text-destructive"
-          aria-label={`Delete ${tableName} record`}
+          aria-label={`Xóa bản ghi ${translateTableName(tableName)}`}
         >
           <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Record</AlertDialogTitle>
+          <AlertDialogTitle>Xóa bản ghi</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this record from{" "}
-            <strong>{tableName}</strong>? This action cannot be undone.
+            Bạn có chắc chắn muốn xóa bản ghi này khỏi{" "}
+            <strong>{translateTableName(tableName)}</strong>? Hành động này không thể hoàn tác.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Hủy</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {loading ? "Deleting…" : "Delete"}
+            {loading ? "Đang xóa…" : "Xóa"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -23,6 +23,8 @@ export const TABLE_TRANSLATIONS: Record<string, string> = {
 
 export const FIELD_TRANSLATIONS: Record<string, string> = {
   id: "Mã",
+  stt: "STT",
+  order: "STT",
   name: "Tên",
   email: "Email",
   phone: "Điện thoại",

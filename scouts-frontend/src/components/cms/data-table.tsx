@@ -39,8 +39,18 @@ function getCollectionField(tableName: string): string {
   return `${tableName}Collection`;
 }
 
+const STT_WIDTH = 64;
 const MIN_COL_WIDTH = 80;
 const ACTIONS_WIDTH = 90;
+
+const DEFAULT_COL_WIDTHS: Record<string, number> = {
+  full_name: 240,
+  name: 200,
+  address: 240,
+  description: 240,
+  content: 240,
+  email: 200,
+};
 
 // Hoisted static arrays — never re-created on render (rendering-hoist-jsx)
 const SKELETON_HEADER_CELLS = Array.from({ length: 4 });
@@ -51,6 +61,12 @@ export function DataTable({ tableName }: DataTableProps) {
   const typeName = tableName.charAt(0).toUpperCase() + tableName.slice(1);
   const { columns, loading: schemaLoading } = useTableSchema(typeName);
   const collectionField = getCollectionField(tableName);
+
+  // Business columns displayed in table (replacing database `id` with `STT`)
+  const displayColumns = useMemo(
+    () => columns.filter((col) => col.name !== "id"),
+    [columns],
+  );
 
   // ---- Data fetching (fetch all records for instant multi-column search & filter) ----
   const {
@@ -104,12 +120,12 @@ export function DataTable({ tableName }: DataTableProps) {
       if (!matchesColumnFilters(row, columnFilters, relationMaps)) {
         return false;
       }
-      if (!matchesSearch(row, searchTerm, columns, relationMaps)) {
+      if (!matchesSearch(row, searchTerm, displayColumns, relationMaps)) {
         return false;
       }
       return true;
     });
-  }, [allRows, columnFilters, searchTerm, columns, relationMaps]);
+  }, [allRows, columnFilters, searchTerm, displayColumns, relationMaps]);
 
   // Client-side pagination derived calculations
   const totalCount = allRows.length;
@@ -159,24 +175,30 @@ export function DataTable({ tableName }: DataTableProps) {
     startWidth: number;
   } | null>(null);
 
+  const getDefaultWidth = useCallback((colName: string) => {
+    return DEFAULT_COL_WIDTHS[colName.toLowerCase()] ?? 160;
+  }, []);
+
   const getColWidth = useCallback(
-    (index: number) => customWidths[index] ?? 160,
-    [customWidths],
+    (colName: string, index: number) => {
+      return customWidths[index] ?? getDefaultWidth(colName);
+    },
+    [customWidths, getDefaultWidth],
   );
 
   const handleResizeStart = useCallback(
-    (e: React.MouseEvent, colIndex: number) => {
+    (e: React.MouseEvent, colIndex: number, currentWidth: number) => {
       e.preventDefault();
       e.stopPropagation();
       dragState.current = {
         colIndex,
         startX: e.clientX,
-        startWidth: customWidths[colIndex] ?? 160,
+        startWidth: currentWidth,
       };
       document.body.style.cursor = "col-resize";
       document.body.style.userSelect = "none";
     },
-    [customWidths],
+    [],
   );
 
   useEffect(() => {
@@ -238,8 +260,12 @@ export function DataTable({ tableName }: DataTableProps) {
         <Table style={{ tableLayout: "fixed" }}>
           {!loading ? (
             <colgroup>
-              {columns.map((col, i) => (
-                <col key={col.name} style={{ width: getColWidth(i) }} />
+              <col style={{ width: STT_WIDTH }} />
+              {displayColumns.map((col, i) => (
+                <col
+                  key={col.name}
+                  style={{ width: getColWidth(col.name, i) }}
+                />
               ))}
               <col style={{ width: ACTIONS_WIDTH }} />
             </colgroup>
@@ -247,41 +273,70 @@ export function DataTable({ tableName }: DataTableProps) {
 
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30 border-b-border/40">
-              {loading
-                ? SKELETON_HEADER_CELLS.map((_, i) => (
+              {loading ? (
+                <>
+                  <TableHead
+                    style={{ width: STT_WIDTH }}
+                    className="text-center"
+                  >
+                    <Skeleton className="h-4 w-8 mx-auto bg-muted-foreground/20" />
+                  </TableHead>
+                  {SKELETON_HEADER_CELLS.map((_, i) => (
                     <TableHead key={i}>
                       <Skeleton className="h-4 w-20 bg-muted-foreground/20" />
                     </TableHead>
-                  ))
-                : columns.map((col, colIndex) => (
-                    <TableHead
-                      key={col.name}
-                      className="font-semibold text-xs text-muted-foreground uppercase tracking-wider relative group select-none"
-                      style={{ width: getColWidth(colIndex) }}
-                    >
-                      <span className="truncate block pr-2">
-                        {translateField(col.name)}
-                      </span>
-                      <div
-                        onMouseDown={(e) => handleResizeStart(e, colIndex)}
-                        className="hidden md:block absolute top-0 right-0 w-0.75 h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
-                        style={{ touchAction: "none" }}
-                        aria-hidden="true"
-                      />
-                    </TableHead>
                   ))}
-              <TableHead
-                className="font-semibold text-xs text-muted-foreground uppercase tracking-wider"
-                style={{ width: ACTIONS_WIDTH }}
-              >
-                Thao tác
-              </TableHead>
+                  <TableHead style={{ width: ACTIONS_WIDTH }}>
+                    <Skeleton className="h-4 w-12 bg-muted-foreground/20" />
+                  </TableHead>
+                </>
+              ) : (
+                <>
+                  <TableHead
+                    className="font-semibold text-xs text-muted-foreground uppercase tracking-wider text-center select-none"
+                    style={{ width: STT_WIDTH }}
+                  >
+                    STT
+                  </TableHead>
+                  {displayColumns.map((col, colIndex) => {
+                    const colWidth = getColWidth(col.name, colIndex);
+                    return (
+                      <TableHead
+                        key={col.name}
+                        className="font-semibold text-xs text-muted-foreground uppercase tracking-wider relative group select-none"
+                        style={{ width: colWidth }}
+                      >
+                        <span className="truncate block pr-2">
+                          {translateField(col.name)}
+                        </span>
+                        <div
+                          onMouseDown={(e) =>
+                            handleResizeStart(e, colIndex, colWidth)
+                          }
+                          className="hidden md:block absolute top-0 right-0 w-0.75 h-full cursor-col-resize z-10 group-hover:bg-primary/20 active:bg-primary/40 transition-colors"
+                          style={{ touchAction: "none" }}
+                          aria-hidden="true"
+                        />
+                      </TableHead>
+                    );
+                  })}
+                  <TableHead
+                    className="font-semibold text-xs text-muted-foreground uppercase tracking-wider"
+                    style={{ width: ACTIONS_WIDTH }}
+                  >
+                    Thao tác
+                  </TableHead>
+                </>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               SKELETON_ROWS.slice(0, Math.min(pageSize, 5)).map((_, i) => (
                 <TableRow key={i} className="border-b-border/20">
+                  <TableCell className="py-4 text-center">
+                    <Skeleton className="h-4 w-6 mx-auto bg-muted/50" />
+                  </TableCell>
                   {SKELETON_ROW_CELLS.map((__, j) => (
                     <TableCell key={j} className="py-4">
                       <Skeleton className="h-4 w-full bg-muted/50" />
@@ -293,7 +348,7 @@ export function DataTable({ tableName }: DataTableProps) {
             ) : totalCount === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + 1}
+                  colSpan={displayColumns.length + 2}
                   className="h-40 text-center text-muted-foreground font-medium"
                 >
                   Chưa có bản ghi nào trong bảng này.
@@ -302,7 +357,7 @@ export function DataTable({ tableName }: DataTableProps) {
             ) : filteredRows.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + 1}
+                  colSpan={displayColumns.length + 2}
                   className="h-44 text-center text-muted-foreground font-medium"
                 >
                   <div className="flex flex-col items-center justify-center gap-2">
@@ -328,7 +383,10 @@ export function DataTable({ tableName }: DataTableProps) {
                   key={String(row.id ?? idx)}
                   className="hover:bg-accent/40 border-b-border/20 transition-colors"
                 >
-                  {columns.map((col) => {
+                  <TableCell className="text-xs text-center font-medium text-muted-foreground py-3">
+                    {fromRecord + idx}
+                  </TableCell>
+                  {displayColumns.map((col) => {
                     const rawValue = row[col.name];
                     // Resolve FK id → label if a relation map exists for this column
                     const relMap = relationMaps[col.name];

@@ -5,20 +5,24 @@ import { useQuery } from "@apollo/client/react";
 import { gql } from "@apollo/client";
 
 export interface RelationOption {
-  value: string; // UUID id
+  id: string;
+  name: string;
+  value: string; // UUID / BigInt id
   label: string; // display name
 }
 
-// Build a lightweight query fetching only id + name from a collection
+// Build a lightweight query fetching only id + name (or full_name) from a collection
 function buildRelationQuery(collectionField: string) {
   const opName = `RelOpts_${collectionField}`;
+  const isMembers = collectionField === "membersCollection";
+  const nameField = isMembers ? "full_name" : "name";
   return gql`
     query ${opName}($first: Int) {
       ${collectionField}(first: $first) {
         edges {
           node {
             id
-            name
+            ${nameField}
           }
         }
       }
@@ -27,12 +31,12 @@ function buildRelationQuery(collectionField: string) {
 }
 
 type CollectionData = {
-  edges: { node: { id: string; name?: string } }[];
+  edges: { node: { id: string | number; name?: string; full_name?: string } }[];
 };
 
 /**
  * Fetch all records from a related collection and return them as
- * { value: id, label: name } options for use in a <select>.
+ * { id, name, value, label } options for use in a <select>.
  *
  * @param collectionField - e.g. "councilsCollection"
  */
@@ -55,10 +59,16 @@ export function useRelationOptions(collectionField: string | undefined): {
     if (!collectionField || !data) return [];
     const collection = (data as Record<string, CollectionData>)[collectionField];
     return (
-      collection?.edges.map((e) => ({
-        value: e.node.id,
-        label: e.node.name ?? e.node.id,
-      })) ?? []
+      collection?.edges.map((e) => {
+        const id = String(e.node.id);
+        const name = String(e.node.name ?? e.node.full_name ?? e.node.id);
+        return {
+          id,
+          name,
+          value: id,
+          label: name,
+        };
+      }) ?? []
     );
   }, [data, collectionField]);
 

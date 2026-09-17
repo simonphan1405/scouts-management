@@ -71,8 +71,10 @@ export function buildUpdateMutation(
   const writableColumns = columns.filter(
     (c) => !["nodeId", "id", "created_at", "updated_at"].includes(c.name),
   );
+  const idCol = columns.find((c) => c.name === "id");
+  const idType = idCol?.type ? `${idCol.type}!` : "BigInt!";
   const inputFields = [
-    "$id: UUID!",
+    `$id: ${idType}`,
     ...writableColumns.map((c) => `$${c.name}: ${c.type}`),
   ].join(", ");
   const setFields = writableColumns
@@ -96,11 +98,14 @@ export function buildUpdateMutation(
   `;
 }
 
-export function buildDeleteMutation(tableName: string): DocumentNode {
+export function buildDeleteMutation(
+  tableName: string,
+  idType: string = "BigInt!",
+): DocumentNode {
   const mutationName = `deleteFrom${capitalize(tableName)}Collection`;
   const opName = `Delete_${capitalize(tableName)}`;
   return gql`
-    mutation ${opName}($id: UUID!) {
+    mutation ${opName}($id: ${idType}) {
       ${mutationName}(filter: { id: { eq: $id } }) {
         records {
           id

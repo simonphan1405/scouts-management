@@ -66,7 +66,9 @@ export function DataTable({ tableName }: DataTableProps) {
 
   // ---- Search & Filter state ----
   const [searchTerm, setSearchTerm] = useState("");
-  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>(
+    {},
+  );
 
   // ---- Pagination state ----
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
@@ -99,7 +101,7 @@ export function DataTable({ tableName }: DataTableProps) {
   // Filtered rows matching both search query and column filters
   const filteredRows = useMemo(() => {
     return allRows.filter((row) => {
-      if (!matchesColumnFilters(row, columnFilters)) {
+      if (!matchesColumnFilters(row, columnFilters, relationMaps)) {
         return false;
       }
       if (!matchesSearch(row, searchTerm, columns, relationMaps)) {
@@ -304,7 +306,10 @@ export function DataTable({ tableName }: DataTableProps) {
                   className="h-44 text-center text-muted-foreground font-medium"
                 >
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <p>Không tìm thấy bản ghi nào khớp với điều kiện tìm kiếm hoặc bộ lọc.</p>
+                    <p>
+                      Không tìm thấy bản ghi nào khớp với điều kiện tìm kiếm
+                      hoặc bộ lọc.
+                    </p>
                     <Button
                       variant="outline"
                       size="sm"
@@ -388,9 +393,10 @@ export function DataTable({ tableName }: DataTableProps) {
             </div>
 
             <span className="text-xs text-muted-foreground">
-              Hiển thị <strong className="text-foreground">{fromRecord}</strong> -{" "}
-              <strong className="text-foreground">{toRecord}</strong> trên{" "}
-              <strong className="text-foreground">{filteredCount}</strong> kết quả
+              Hiển thị <strong className="text-foreground">{fromRecord}</strong>{" "}
+              - <strong className="text-foreground">{toRecord}</strong> trên{" "}
+              <strong className="text-foreground">{filteredCount}</strong> kết
+              quả
             </span>
           </div>
 

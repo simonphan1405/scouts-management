@@ -62,10 +62,12 @@ export interface ActiveFilter {
 
 /**
  * Check if a row satisfies all active column filters.
+ * Supports exact match, case-insensitive match, and Foreign Key ID <-> Name bidirectional resolution.
  */
 export function matchesColumnFilters(
   row: Record<string, unknown>,
   filters: Record<string, string>,
+  relationMaps?: Record<string, Map<string, string>>,
 ): boolean {
   for (const [colName, expectedValue] of Object.entries(filters)) {
     if (!expectedValue || expectedValue === "") continue;
@@ -75,10 +77,54 @@ export function matchesColumnFilters(
       return false;
     }
 
-    // Exact string match for selection filters
-    if (String(actualValue) !== expectedValue) {
-      return false;
+    const actualStr = String(actualValue).trim();
+    const expectedStr = expectedValue.trim();
+
+    // 1. Direct match (case-insensitive)
+    if (actualStr.toLowerCase() === expectedStr.toLowerCase()) {
+      continue;
     }
+
+    // 2. Relation map lookup (supports actual=ID, expected=Name OR actual=Name, expected=ID)
+    const relMap = relationMaps?.[colName];
+    if (relMap) {
+      // actual is ID, expected is label (e.g. actual="4", expected="Voi")
+      const resolvedFromActual = relMap.get(actualStr);
+      if (
+        resolvedFromActual &&
+        resolvedFromActual.toLowerCase() === expectedStr.toLowerCase()
+      ) {
+        continue;
+      }
+
+      // expected is ID, actual is label (e.g. actual="Voi", expected="4")
+      const resolvedFromExpected = relMap.get(expectedStr);
+      if (
+        resolvedFromExpected &&
+        resolvedFromExpected.toLowerCase() === actualStr.toLowerCase()
+      ) {
+        continue;
+      }
+
+      // Any ID/Label pair match
+      let matchedByPair = false;
+      for (const [id, label] of relMap.entries()) {
+        if (
+          (id === actualStr &&
+            label.toLowerCase() === expectedStr.toLowerCase()) ||
+          (id === expectedStr &&
+            label.toLowerCase() === actualStr.toLowerCase())
+        ) {
+          matchedByPair = true;
+          break;
+        }
+      }
+      if (matchedByPair) {
+        continue;
+      }
+    }
+
+    return false;
   }
   return true;
 }

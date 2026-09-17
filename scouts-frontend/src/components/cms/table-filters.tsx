@@ -23,6 +23,27 @@ interface TableFiltersProps {
   relationMaps: Record<string, Map<string, string>>;
 }
 
+const PRIORITY_COLUMNS = [
+  "current_section",
+  "section",
+  "gender",
+  "unit_type",
+  "role",
+  "status",
+  "troop",
+  "unit",
+  "group",
+  "district",
+  "council",
+  "ranking",
+  "religion",
+  "level",
+  "join_year",
+  "promise_year",
+  "code",
+  "name",
+];
+
 export function TableFilters({
   tableName,
   columns,
@@ -37,18 +58,12 @@ export function TableFilters({
   relationMaps,
 }: TableFiltersProps) {
   const [showFilterPanel, setShowFilterPanel] = useState(false);
-
   const searchInputId = useId();
 
-  // Columns suitable for filtering: exclude IDs and dates
+  // Columns suitable for filtering: all business columns (exclude system id and timestamps)
   const filterableColumns = useMemo(() => {
     return columns.filter(
-      (c) =>
-        !["id", "nodeId", "created_at", "updated_at"].includes(c.name) &&
-        (c.relationTo ||
-          c.type === "String" ||
-          c.type === "Int" ||
-          c.type === "Boolean"),
+      (c) => !["id", "nodeId", "created_at", "updated_at"].includes(c.name),
     );
   }, [columns]);
 
@@ -66,53 +81,68 @@ export function TableFilters({
     const map: Record<string, { value: string; label: string }[]> = {};
 
     for (const col of filterableColumns) {
-      // If column is a foreign key, use options from relationMaps
-      if (col.relationTo && relationMaps[col.name]) {
-        const relMap = relationMaps[col.name];
-        map[col.name] = Array.from(relMap.entries()).map(([val, label]) => ({
-          value: val,
-          label,
-        }));
-      } else {
-        // Otherwise, extract distinct non-null values from rows
-        const uniqueValues = new Set<string>();
-        for (const row of allRows) {
-          const val = row[col.name];
-          if (val != null && String(val).trim() !== "") {
-            uniqueValues.add(String(val));
+      const optionsMap = new Map<string, string>(); // value -> label
+
+      // 1. Collect distinct values directly from allRows
+      for (const row of allRows) {
+        const val = row[col.name];
+        if (val != null && String(val).trim() !== "") {
+          const strVal = String(val).trim();
+          const relMap = relationMaps[col.name];
+          const resolvedLabel = relMap?.get(strVal) ?? strVal;
+          optionsMap.set(strVal, resolvedLabel);
+        }
+      }
+
+      // 2. If it is a foreign key, also merge in any known options from relationMaps
+      const relMap = relationMaps[col.name];
+      if (relMap) {
+        for (const [val, label] of relMap.entries()) {
+          // If optionsMap doesn't have this value and doesn't already have this label
+          if (
+            !optionsMap.has(val) &&
+            !Array.from(optionsMap.values()).includes(label)
+          ) {
+            optionsMap.set(val, label);
           }
         }
-        map[col.name] = Array.from(uniqueValues)
-          .sort((a, b) => a.localeCompare(b, "vi"))
-          .map((val) => ({
-            value: val,
-            label: val,
-          }));
       }
+
+      // Convert map to array and sort
+      map[col.name] = Array.from(optionsMap.entries())
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label, "vi"));
     }
 
     return map;
   }, [filterableColumns, relationMaps, allRows]);
 
-  // Quick filter columns (top 2-3 prominent columns, e.g. FKs or section/gender)
-  const quickFilterColumns = useMemo(() => {
-    return filterableColumns
-      .filter(
-        (c) =>
-          c.relationTo ||
-          ["current_section", "section", "gender", "unit_type", "role", "status"].includes(
-            c.name,
-          ),
-      )
-      .slice(0, 3);
-  }, [filterableColumns]);
+  // Quick filter columns (up to 4 priority columns with options)
+  const priorityMatches = filterableColumns.filter(
+    (c) =>
+      PRIORITY_COLUMNS.includes(c.name.toLowerCase()) &&
+      (columnOptionsMap[c.name]?.length ?? 0) >= 1,
+  );
+
+  priorityMatches.sort((a, b) => {
+    const idxA = PRIORITY_COLUMNS.indexOf(a.name.toLowerCase());
+    const idxB = PRIORITY_COLUMNS.indexOf(b.name.toLowerCase());
+    return idxA - idxB;
+  });
+
+  const quickFilterColumns =
+    priorityMatches.length > 0
+      ? priorityMatches.slice(0, 4)
+      : filterableColumns
+          .filter((c) => (columnOptionsMap[c.name]?.length ?? 0) >= 1)
+          .slice(0, 3);
 
   return (
     <div className="space-y-3 mb-4">
       {/* Top Toolbar: Search Bar + Quick Filters + Toggle Advanced Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
         {/* Universal Search Input */}
-        <div className="relative flex-1 min-w-[240px]">
+        <div className="relative flex-1 min-w-55">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none"
             aria-hidden="true"
@@ -129,7 +159,7 @@ export function TableFilters({
             <button
               type="button"
               onClick={() => onSearchChange("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/60 transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/60 transition-colors cursor-pointer"
               aria-label="Xóa từ khóa tìm kiếm"
             >
               <X className="h-3.5 w-3.5" />
@@ -137,7 +167,7 @@ export function TableFilters({
           ) : null}
         </div>
 
-        {/* Quick Filter Selects (if applicable) */}
+        {/* Quick Filter Selects */}
         {quickFilterColumns.map((col) => {
           const options = columnOptionsMap[col.name] ?? [];
           if (options.length === 0) return null;
@@ -145,11 +175,19 @@ export function TableFilters({
           const currentValue = columnFilters[col.name] ?? "";
 
           return (
-            <div key={col.name} className="relative shrink-0 min-w-[140px] max-w-[200px]">
+            <div
+              key={col.name}
+              className="relative shrink-0 min-w-32.5 max-w-47.5"
+            >
               <select
                 value={currentValue}
                 onChange={(e) => onFilterChange(col.name, e.target.value)}
-                className="w-full h-9.5 rounded-lg border border-border/50 bg-card/60 backdrop-blur-sm px-2.5 pr-7 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition-all hover:bg-card truncate appearance-none"
+                className={cn(
+                  "w-full h-9.5 rounded-lg border bg-card/60 backdrop-blur-sm px-2.5 pr-7 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition-all hover:bg-card truncate appearance-none",
+                  currentValue
+                    ? "border-primary/50 text-primary font-semibold bg-primary/5"
+                    : "border-border/50 text-foreground/80",
+                )}
                 aria-label={`Lọc theo ${translateField(col.name)}`}
               >
                 <option value="">-- {translateField(col.name)} --</option>
@@ -186,7 +224,7 @@ export function TableFilters({
           ) : null}
         </Button>
 
-        {/* Clear all filters button if anything is filtered */}
+        {/* Reset / Clear all filters button */}
         {activeCount > 0 ? (
           <Button
             type="button"
@@ -208,7 +246,7 @@ export function TableFilters({
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold text-foreground/80 tracking-wide uppercase flex items-center gap-1.5">
               <Filter className="h-3.5 w-3.5 text-primary" />
-              Lọc dữ liệu theo cột
+              Tất cả bộ lọc theo cột ({filterableColumns.length} cột)
             </h4>
             <span className="text-[11px] text-muted-foreground">
               Chọn cột và giá trị để lọc chính xác
@@ -229,8 +267,15 @@ export function TableFilters({
                     <div className="relative">
                       <select
                         value={currentValue}
-                        onChange={(e) => onFilterChange(col.name, e.target.value)}
-                        className="w-full h-8.5 rounded-md border border-border/50 bg-background/60 px-2 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary truncate appearance-none cursor-pointer"
+                        onChange={(e) =>
+                          onFilterChange(col.name, e.target.value)
+                        }
+                        className={cn(
+                          "w-full h-8.5 rounded-md border bg-background/60 px-2 pr-6 text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary truncate appearance-none cursor-pointer",
+                          currentValue
+                            ? "border-primary/50 text-primary font-medium"
+                            : "border-border/50 text-foreground",
+                        )}
                       >
                         <option value="">Tất cả</option>
                         {options.map((opt) => (
@@ -266,7 +311,10 @@ export function TableFilters({
               className="gap-1.5 pl-2 pr-1.5 py-0.5 text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors"
             >
               <span>
-                Từ khóa: <strong className="font-semibold">&quot;{searchTerm}&quot;</strong>
+                Từ khóa:{" "}
+                <strong className="font-semibold">
+                  &quot;{searchTerm}&quot;
+                </strong>
               </span>
               <button
                 type="button"
@@ -281,7 +329,11 @@ export function TableFilters({
 
           {activeFiltersList.map(([colName, filterVal]) => {
             const relMap = relationMaps[colName];
-            const displayLabel = relMap?.get(filterVal) ?? filterVal;
+            const displayLabel =
+              relMap?.get(filterVal) ??
+              columnOptionsMap[colName]?.find((o) => o.value === filterVal)
+                ?.label ??
+              filterVal;
 
             return (
               <Badge
@@ -291,7 +343,9 @@ export function TableFilters({
               >
                 <span>
                   {translateField(colName)}:{" "}
-                  <strong className="font-semibold text-primary">{displayLabel}</strong>
+                  <strong className="font-semibold text-primary">
+                    {displayLabel}
+                  </strong>
                 </span>
                 <button
                   type="button"
@@ -320,11 +374,19 @@ export function TableFilters({
         <div className="text-xs text-muted-foreground font-medium ml-auto">
           {activeCount > 0 ? (
             <span>
-              Tìm thấy <strong className="text-foreground font-semibold">{filteredCount}</strong> / {totalCount} bản ghi
+              Tìm thấy{" "}
+              <strong className="text-foreground font-semibold">
+                {filteredCount}
+              </strong>{" "}
+              / {totalCount} bản ghi
             </span>
           ) : (
             <span>
-              Tổng số <strong className="text-foreground font-semibold">{totalCount}</strong> bản ghi
+              Tổng số{" "}
+              <strong className="text-foreground font-semibold">
+                {totalCount}
+              </strong>{" "}
+              bản ghi
             </span>
           )}
         </div>

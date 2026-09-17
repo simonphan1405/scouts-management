@@ -116,7 +116,14 @@ export function parseColumnMeta(fields: GqlField[]): ColumnMeta[] {
       // Detect FK: scalar field "council" → look for OBJECT field "councils" (plural form)
       // Convention: FK field name + "s" = navigation field name
       const pluralName = `${f.name}s`;
-      const relationTo = objectFieldsByName.get(pluralName);
+      let relationTo = objectFieldsByName.get(pluralName);
+      if (!relationTo) {
+        if (f.name === "current_section" || f.name === "section") {
+          relationTo = objectFieldsByName.get("sections");
+        } else if (f.name.endsWith("_id")) {
+          relationTo = objectFieldsByName.get(`${f.name.replace(/_id$/, "")}s`);
+        }
+      }
       return {
         name: f.name,
         type: resolveTypeName(f.type),

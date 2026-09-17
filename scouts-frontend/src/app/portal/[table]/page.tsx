@@ -6,5 +6,5 @@ export default async function TablePage({
   params: Promise<{ table: string }>;
 }) {
   const { table } = await params;
-  return <DataTable tableName={table} />;
+  return <DataTable key={table} tableName={table} />;
 }

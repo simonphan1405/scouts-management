@@ -21,17 +21,11 @@ type CollectionData = {
   pageInfo: { hasNextPage: boolean; endCursor: string | null };
 };
 
-interface PaginationState {
-  /** Stack of cursors for visited pages. Index i = cursor to start page i+1. Index 0 is always null (first page). */
-  cursors: (string | null)[];
-  currentPage: number;
-  pageSize: number;
-}
 
 export function useTableData(
   collectionField: string,
   columns: ColumnMeta[],
-  pagination: PaginationState,
+  fetchLimit: number = 1000,
 ) {
   const skip = !collectionField || columns.length === 0;
 
@@ -42,10 +36,8 @@ export function useTableData(
     [collectionField, columnKey, skip],
   );
 
-  const cursor = pagination.cursors[pagination.currentPage] ?? null;
-
   const { data, loading, error, refetch } = useQuery(query, {
-    variables: { first: pagination.pageSize, after: cursor },
+    variables: { first: fetchLimit },
     skip,
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
@@ -60,8 +52,8 @@ export function useTableData(
   };
 
   const reset = useCallback(() => {
-    refetch({ first: pagination.pageSize, after: null });
-  }, [refetch, pagination.pageSize]);
+    refetch({ first: fetchLimit });
+  }, [refetch, fetchLimit]);
 
   return { rows, loading, error, refetch: reset, pageInfo };
 }

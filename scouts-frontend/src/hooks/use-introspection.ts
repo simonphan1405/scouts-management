@@ -1,65 +1,89 @@
 "use client";
 
-import { useQuery } from "@apollo/client/react";
-import {
-  SCHEMA_COLLECTIONS_QUERY,
-  TYPE_FIELDS_QUERY,
-  isCollectionField,
-  collectionFieldToTableName,
-  getNodeTypeName,
-  parseColumnMeta,
-} from "@/lib/graphql/introspection";
-import type { GqlField, TableMeta, ColumnMeta } from "@/lib/graphql/types";
-
-interface SchemaQueryResult {
-  __schema: {
-    queryType: {
-      fields: GqlField[];
-    };
-  };
-}
-
-interface TypeQueryResult {
-  __type: {
-    name: string;
-    fields: GqlField[];
-  };
-}
+import { useEffect, useState } from "react";
+import { apiClient } from "@/lib/api-client";
+import type { TableMeta, ColumnMeta } from "@/lib/graphql/types";
 
 export function useTableList(): {
   tables: TableMeta[];
   loading: boolean;
   error: Error | undefined;
 } {
-  const { data, loading, error } = useQuery<SchemaQueryResult>(
-    SCHEMA_COLLECTIONS_QUERY
-  );
+  const [tables, setTables] = useState<TableMeta[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  const tables: TableMeta[] =
-    data?.__schema.queryType.fields
-      .filter(isCollectionField)
-      .map((f) => ({
-        name: collectionFieldToTableName(f.name),
-        collectionField: f.name,
-        typeName: getNodeTypeName(f.name),
-      })) ?? [];
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
 
-  return { tables, loading, error: error as Error | undefined };
+    apiClient
+      .get<TableMeta[]>("/tables")
+      .then((data) => {
+        if (isMounted) {
+          setTables(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  return { tables, loading, error };
 }
 
-export function useTableSchema(typeName: string): {
+export function useTableSchema(tableOrTypeName: string): {
   columns: ColumnMeta[];
   loading: boolean;
   error: Error | undefined;
 } {
-  const { data, loading, error } = useQuery<TypeQueryResult>(TYPE_FIELDS_QUERY, {
-    variables: { typeName },
-    skip: !typeName,
-  });
+  const [columns, setColumns] = useState<ColumnMeta[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  const columns = data?.__type?.fields
-    ? parseColumnMeta(data.__type.fields).filter((c) => !["nodeId", "created_at", "updated_at"].includes(c.name))
-    : [];
+  useEffect(() => {
+    if (!tableOrTypeName) {
+      setColumns([]);
+      setLoading(false);
+      return;
+    }
 
-  return { columns, loading, error: error as Error | undefined };
+    let isMounted = true;
+    setLoading(true);
+
+    const tableName = tableOrTypeName.replace(/Collection$/i, "").toLowerCase();
+
+    apiClient
+      .get<ColumnMeta[]>(`/tables/${tableName}/schema`)
+      .then((data) => {
+        if (isMounted) {
+          // Lọc bỏ các cột kỹ thuật không cần thiết nếu có
+          const cleanCols = data.filter(
+            (c) => !["nodeId", "created_at", "updated_at"].includes(c.name),
+          );
+          setColumns(cleanCols);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [tableOrTypeName]);
+
+  return { columns, loading, error };
 }

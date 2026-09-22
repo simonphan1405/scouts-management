@@ -22,7 +22,11 @@ interface CreateModalProps {
   onCreated: () => void;
 }
 
-export function CreateModal({ tableName, columns, onCreated }: CreateModalProps) {
+export function CreateModal({
+  tableName,
+  columns,
+  onCreated,
+}: CreateModalProps) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, unknown>>({});
   const { createRecord, loading } = useCreateRecord(tableName, columns);
@@ -46,16 +50,26 @@ export function CreateModal({ tableName, columns, onCreated }: CreateModalProps)
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[90dvh] w-[calc(100vw-1.5rem)] flex flex-col p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Tạo bản ghi mới: {translateTableName(tableName)}</DialogTitle>
+          <DialogTitle>
+            Tạo bản ghi mới: {translateTableName(tableName)}
+          </DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
           <RecordForm columns={columns} values={values} onChange={setValues} />
         </div>
         <DialogFooter className="flex-col-reverse sm:flex-row gap-2 pt-2">
-          <Button variant="outline" onClick={handleCancel} className="w-full sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            className="w-full sm:w-auto"
+          >
             Hủy
           </Button>
-          <Button onClick={handleSubmit} disabled={loading} className="w-full sm:w-auto">
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
             {loading ? "Đang tạo…" : "Tạo bản ghi"}
           </Button>
         </DialogFooter>
@@ -63,4 +77,3 @@ export function CreateModal({ tableName, columns, onCreated }: CreateModalProps)
     </Dialog>
   );
 }
-

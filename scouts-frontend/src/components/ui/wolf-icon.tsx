@@ -54,7 +54,7 @@ export const WolfIcon = forwardRef<SVGSVGElement, WolfIconProps>(
         <path d="M11 17.5h2" />
       </svg>
     );
-  }
+  },
 );
 
 WolfIcon.displayName = "WolfIcon";

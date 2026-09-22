@@ -102,9 +102,15 @@ body {
 }
 
 @keyframes breathing-mesh {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .mesh-bg {
@@ -131,17 +137,17 @@ body {
 .scout-palette-strip {
   background: linear-gradient(
     90deg,
-    #E01205 0%,
-    #E01205 16.66%,
-    #EDB55E 16.66%,
-    #EDB55E 33.33%,
-    #7D58D9 33.33%,
-    #7D58D9 50%,
-    #D6C3DF 50%,
-    #D6C3DF 66.66%,
-    #E1E1E1 66.66%,
-    #E1E1E1 83.33%,
-    #5CB856 83.33%,
-    #5CB856 100%
+    #e01205 0%,
+    #e01205 16.66%,
+    #edb55e 16.66%,
+    #edb55e 33.33%,
+    #7d58d9 33.33%,
+    #7d58d9 50%,
+    #d6c3df 50%,
+    #d6c3df 66.66%,
+    #e1e1e1 66.66%,
+    #e1e1e1 83.33%,
+    #5cb856 83.33%,
+    #5cb856 100%
   );
 }

@@ -1,38 +1,37 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { useMutation } from "@apollo/client/react";
-import { buildInsertMutation } from "@/lib/graphql/query-builder";
+import { useCallback, useState } from "react";
+import { apiClient } from "@/lib/api-client";
 import type { ColumnMeta } from "@/lib/graphql/types";
 
 export function useCreateRecord(tableName: string, columns: ColumnMeta[]) {
-  const columnKey = columns.map((c) => c.name).join(",");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const mutation = useMemo(() => buildInsertMutation(tableName, columns), [tableName, columnKey]);
-  const [mutate, { loading, error }] = useMutation(mutation);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  const cleanTableName = tableName
+    ? tableName.replace(/Collection$/i, "").toLowerCase()
+    : "";
 
   const createRecord = useCallback(
-    (values: Record<string, unknown>) => {
-      const writableColumns = columns.filter(
-        (c) => !["nodeId", "id", "created_at", "updated_at"].includes(c.name),
-      );
+    async (values: Record<string, unknown>) => {
+      setLoading(true);
+      setError(undefined);
 
-      const cleanValues: Record<string, unknown> = {};
-      for (const col of writableColumns) {
-        if (values[col.name] !== undefined) {
-          let val = values[col.name];
-          if ((col.type === "BigInt" || col.type === "Int") && val !== null && val !== "") {
-            val = !isNaN(Number(val)) ? Number(val) : val;
-          } else if (val === "" && col.nullable) {
-            val = null;
-          }
-          cleanValues[col.name] = val;
-        }
+      try {
+        const result = await apiClient.post(
+          `/tables/${cleanTableName}`,
+          values,
+        );
+        return result;
+      } catch (err: any) {
+        const errorObj = err instanceof Error ? err : new Error(String(err));
+        setError(errorObj);
+        throw errorObj;
+      } finally {
+        setLoading(false);
       }
-
-      return mutate({ variables: cleanValues });
     },
-    [mutate, columns],
+    [cleanTableName],
   );
 
   return { createRecord, loading, error };

@@ -11,7 +11,12 @@ interface RowActionsProps {
   onRefetch: () => void;
 }
 
-export function RowActions({ tableName, columns, row, onRefetch }: RowActionsProps) {
+export function RowActions({
+  tableName,
+  columns,
+  row,
+  onRefetch,
+}: RowActionsProps) {
   return (
     <div className="flex items-center gap-1">
       <EditModal

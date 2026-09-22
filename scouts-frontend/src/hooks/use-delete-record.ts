@@ -1,18 +1,36 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { useMutation } from "@apollo/client/react";
-import { buildDeleteMutation } from "@/lib/graphql/query-builder";
+import { useCallback, useState } from "react";
+import { apiClient } from "@/lib/api-client";
 
 export function useDeleteRecord(tableName: string) {
-  const mutation = useMemo(() => buildDeleteMutation(tableName), [tableName]);
-  const [mutate, { loading, error }] = useMutation(mutation);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  const cleanTableName = tableName
+    ? tableName.replace(/Collection$/i, "").toLowerCase()
+    : "";
 
   const deleteRecord = useCallback(
-    (id: string) => mutate({ variables: { id } }),
-    [mutate],
+    async (id: string) => {
+      setLoading(true);
+      setError(undefined);
+
+      try {
+        const result = await apiClient.delete(
+          `/tables/${cleanTableName}/${id}`,
+        );
+        return result;
+      } catch (err: any) {
+        const errorObj = err instanceof Error ? err : new Error(String(err));
+        setError(errorObj);
+        throw errorObj;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [cleanTableName],
   );
 
   return { deleteRecord, loading, error };
 }
-

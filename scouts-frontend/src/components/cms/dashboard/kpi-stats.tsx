@@ -134,7 +134,10 @@ export function KpiStats({
             <div className="relative z-10 flex items-start justify-between">
               <div
                 className="p-2.5 rounded-xl border border-border/50 shadow-xs"
-                style={{ backgroundColor: `${item.color}15`, color: item.color }}
+                style={{
+                  backgroundColor: `${item.color}15`,
+                  color: item.color,
+                }}
               >
                 <Icon className="h-5 w-5" />
               </div>

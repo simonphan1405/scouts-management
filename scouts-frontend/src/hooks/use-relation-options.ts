@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { useQuery } from "@apollo/client/react";
-import { gql } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { apiClient } from "@/lib/api-client";
 
 export interface RelationOption {
   id: string;
@@ -11,66 +10,48 @@ export interface RelationOption {
   label: string; // display name
 }
 
-// Build a lightweight query fetching only id + name (or full_name) from a collection
-function buildRelationQuery(collectionField: string) {
-  const opName = `RelOpts_${collectionField}`;
-  const isMembers = collectionField === "membersCollection";
-  const nameField = isMembers ? "full_name" : "name";
-  return gql`
-    query ${opName}($first: Int) {
-      ${collectionField}(first: $first) {
-        edges {
-          node {
-            id
-            ${nameField}
-          }
-        }
-      }
-    }
-  `;
-}
-
-type CollectionData = {
-  edges: { node: { id: string | number; name?: string; full_name?: string } }[];
-};
-
 /**
- * Fetch all records from a related collection and return them as
- * { id, name, value, label } options for use in a <select>.
- *
- * @param collectionField - e.g. "councilsCollection"
+ * Lấy danh sách records từ bảng quan hệ từ scouts-backend
+ * và trả về options { id, name, value, label } dùng cho combobox/select.
  */
 export function useRelationOptions(collectionField: string | undefined): {
   options: RelationOption[];
   loading: boolean;
 } {
-  const query = useMemo(
-    () => (collectionField ? buildRelationQuery(collectionField) : null),
-    [collectionField],
-  );
+  const [options, setOptions] = useState<RelationOption[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const { data, loading } = useQuery(query ?? gql`query _Skip { __typename }`, {
-    variables: { first: 1000 },
-    skip: !collectionField || !query,
-    fetchPolicy: "cache-first",
-  });
+  useEffect(() => {
+    if (!collectionField) {
+      setOptions([]);
+      setLoading(false);
+      return;
+    }
 
-  const options: RelationOption[] = useMemo(() => {
-    if (!collectionField || !data) return [];
-    const collection = (data as Record<string, CollectionData>)[collectionField];
-    return (
-      collection?.edges.map((e) => {
-        const id = String(e.node.id);
-        const name = String(e.node.name ?? e.node.full_name ?? e.node.id);
-        return {
-          id,
-          name,
-          value: id,
-          label: name,
-        };
-      }) ?? []
-    );
-  }, [data, collectionField]);
+    const tableName = collectionField.replace(/Collection$/i, "").toLowerCase();
+    let isMounted = true;
+    setLoading(true);
+
+    apiClient
+      .get<RelationOption[]>(`/tables/${tableName}/relations`)
+      .then((data) => {
+        if (isMounted) {
+          setOptions(data || []);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.warn(`Lỗi lấy options quan hệ cho bảng ${tableName}:`, err);
+        if (isMounted) {
+          setOptions([]);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [collectionField]);
 
   return { options, loading };
 }

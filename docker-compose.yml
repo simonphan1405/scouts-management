@@ -1,0 +1,49 @@
+services:
+  backend:
+    build:
+      context: ./scouts-backend
+      dockerfile: Dockerfile
+    container_name: scouts-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    environment:
+      - PORT=3001
+      - SUPABASE_URL=${SUPABASE_URL:-}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+    env_file:
+      - path: ./scouts-backend/.env
+        required: false
+      - path: .env
+        required: false
+    networks:
+      - scouts-network
+
+  frontend:
+    build:
+      context: ./scouts-frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    container_name: scouts-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+    env_file:
+      - path: ./scouts-frontend/.env.local
+        required: false
+      - path: .env
+        required: false
+    depends_on:
+      - backend
+    networks:
+      - scouts-network
+
+networks:
+  scouts-network:
+    driver: bridge

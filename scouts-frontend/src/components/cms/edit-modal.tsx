@@ -31,7 +31,7 @@ export function EditModal({
 }: EditModalProps) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, unknown>>(row);
-  const { updateRecord, loading } = useUpdateRecord(tableName, columns);
+  const { updateRecord, loading } = useUpdateRecord(tableName);
 
   const handleOpenChange = useCallback(
     (o: boolean) => {

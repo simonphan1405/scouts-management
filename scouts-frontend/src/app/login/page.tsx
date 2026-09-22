@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { apiClient, setToken } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { ScoutEmblem } from "@/components/ui/scout-emblem";
 import { Mail, Lock, Eye, EyeOff, Sparkles, Loader2 } from "lucide-react";
@@ -21,20 +21,22 @@ export default function LoginPage() {
       setError(null);
       setLoading(true);
 
-      const supabase = createClient();
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      try {
+        const res = await apiClient.post("/auth/login", {
+          email,
+          password,
+        });
 
-      if (authError) {
-        setError(authError.message);
+        if (res.session?.access_token) {
+          setToken(res.session.access_token);
+        }
+
+        router.push("/portal");
+        router.refresh();
+      } catch (err: any) {
+        setError(err.message || "Thông tin đăng nhập không chính xác.");
         setLoading(false);
-        return;
       }
-
-      router.push("/portal");
-      router.refresh();
     },
     [email, password, router],
   );

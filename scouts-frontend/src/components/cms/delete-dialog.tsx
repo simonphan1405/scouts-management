@@ -23,7 +23,11 @@ interface DeleteDialogProps {
   onDeleted: () => void;
 }
 
-export function DeleteDialog({ tableName, recordId, onDeleted }: DeleteDialogProps) {
+export function DeleteDialog({
+  tableName,
+  recordId,
+  onDeleted,
+}: DeleteDialogProps) {
   const [open, setOpen] = useState(false);
   const { deleteRecord, loading } = useDeleteRecord(tableName);
 
@@ -50,7 +54,8 @@ export function DeleteDialog({ tableName, recordId, onDeleted }: DeleteDialogPro
           <AlertDialogTitle>Xóa bản ghi</AlertDialogTitle>
           <AlertDialogDescription>
             Bạn có chắc chắn muốn xóa bản ghi này khỏi{" "}
-            <strong>{translateTableName(tableName)}</strong>? Hành động này không thể hoàn tác.
+            <strong>{translateTableName(tableName)}</strong>? Hành động này
+            không thể hoàn tác.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -67,4 +72,3 @@ export function DeleteDialog({ tableName, recordId, onDeleted }: DeleteDialogPro
     </AlertDialog>
   );
 }
-

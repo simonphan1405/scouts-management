@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ApolloClientProvider } from "@/lib/apollo/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Scouts CMS",
-  description: "Admin CMS powered by Supabase GraphQL",
+  title: "Scouts Management",
+  description: "Hệ Thống Quản Lý Hướng Đạo Việt Nam",
 };
 
 export default function RootLayout({
@@ -24,12 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <ApolloClientProvider>{children}</ApolloClientProvider>
+        {children}
       </body>
     </html>
   );

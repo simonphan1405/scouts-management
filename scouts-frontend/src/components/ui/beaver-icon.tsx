@@ -65,7 +65,7 @@ export const BeaverIcon = forwardRef<SVGSVGElement, BeaverIconProps>(
         <path d="M20 16.5h-2.5" />
       </svg>
     );
-  }
+  },
 );
 
 BeaverIcon.displayName = "BeaverIcon";

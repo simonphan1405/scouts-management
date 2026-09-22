@@ -32,7 +32,13 @@ interface RecordFormProps {
   onChange: (values: Record<string, unknown>) => void;
 }
 
-const FULL_WIDTH_FIELDS = ["notes", "description", "content", "address", "requirement"];
+const FULL_WIDTH_FIELDS = [
+  "notes",
+  "description",
+  "content",
+  "address",
+  "requirement",
+];
 
 export function RecordForm({ columns, values, onChange }: RecordFormProps) {
   const writableColumns = columns.filter((c) => !EXCLUDED.includes(c.name));
@@ -54,13 +60,12 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
             key={col.name}
             className={`space-y-1.5 ${isFullWidth ? "sm:col-span-2" : ""}`}
           >
-            <Label
-              htmlFor={col.name}
-              className="text-sm font-medium"
-            >
+            <Label htmlFor={col.name} className="text-sm font-medium">
               {translateField(col.name)}
               {!col.nullable && (
-                <span className="text-destructive ml-1" aria-hidden="true">*</span>
+                <span className="text-destructive ml-1" aria-hidden="true">
+                  *
+                </span>
               )}
             </Label>
 
@@ -76,7 +81,9 @@ export function RecordForm({ columns, values, onChange }: RecordFormProps) {
                 placeholder={translateField(col.name)}
                 onChange={(val) => {
                   const finalVal =
-                    (col.type === "BigInt" || col.type === "Int") && val != null && val !== ""
+                    (col.type === "BigInt" || col.type === "Int") &&
+                    val != null &&
+                    val !== ""
                       ? Number(val)
                       : val;
                   handleChange(col.name, finalVal);

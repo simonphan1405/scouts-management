@@ -10,8 +10,7 @@ import { ChevronDown, LayoutDashboard, LogOut, Search, X } from "lucide-react";
 import { ScoutEmblem } from "@/components/ui/scout-emblem";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { resetApolloClient } from "@/lib/apollo/client";
+import { apiClient, removeToken } from "@/lib/api-client";
 import { translateTableName } from "@/lib/i18n/cms";
 import { Separator } from "@/components/ui/separator";
 import type { TableMeta } from "@/lib/graphql/types";
@@ -161,9 +160,12 @@ export function Sidebar() {
 
   const handleSignOut = useCallback(async () => {
     setSigningOut(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    resetApolloClient();
+    try {
+      await apiClient.post("/auth/logout");
+    } catch {
+      // Bỏ qua lỗi nếu logout backend gặp sự cố mạng
+    }
+    removeToken();
     router.push("/login");
     router.refresh();
   }, [router]);
@@ -221,7 +223,7 @@ export function Sidebar() {
       <aside
         className={cn(
           "shrink-0 border-r border-border/40 bg-card/95 md:bg-card/60 backdrop-blur-xl flex flex-col h-dvh md:h-screen fixed left-0 top-0 select-none z-50 md:z-40 transition-transform md:transition-[width] duration-300 ease-out",
-          "w-[280px] sm:w-[300px] md:w-auto",
+          "w-70 sm:w-75 md:w-auto",
           isMobileOpen
             ? "translate-x-0 shadow-2xl"
             : "-translate-x-full md:translate-x-0",
@@ -284,168 +286,168 @@ export function Sidebar() {
               </Link>
             </div>
 
-          <Separator className="bg-border/40 my-2" />
+            <Separator className="bg-border/40 my-2" />
 
-          {/* Table Search Input */}
-          {!loading ? (
-            <div className="relative mb-2.5">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm bảng..."
-                className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-border/40 bg-background/50 focus:outline-none focus:ring-1 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground/60 transition-all"
-              />
-              {searchQuery ? (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/40 transition-colors cursor-pointer"
-                  aria-label="Xóa tìm kiếm bảng"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              ) : null}
-            </div>
-          ) : null}
+            {/* Table Search Input */}
+            {!loading ? (
+              <div className="relative mb-2.5">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Tìm bảng..."
+                  className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-border/40 bg-background/50 focus:outline-none focus:ring-1 focus:ring-primary/50 text-foreground placeholder:text-muted-foreground/60 transition-all"
+                />
+                {searchQuery ? (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/40 transition-colors cursor-pointer"
+                    aria-label="Xóa tìm kiếm bảng"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
 
-          {loading ? (
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Skeleton className="h-5 w-28 rounded-md" />
-                <div className="space-y-1 pt-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Skeleton
-                      key={`g1-${i}`}
-                      className="h-8 w-full rounded-lg"
-                    />
-                  ))}
-                </div>
-              </div>
-              <Separator className="bg-border/40" />
-              <div className="space-y-1.5">
-                <Skeleton className="h-5 w-24 rounded-md" />
-                <div className="space-y-1 pt-1">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton
-                      key={`g2-${i}`}
-                      className="h-8 w-full rounded-lg"
-                    />
-                  ))}
-                </div>
-              </div>
-              <Separator className="bg-border/40" />
-              <div className="space-y-1.5">
-                <Skeleton className="h-5 w-36 rounded-md" />
-                <div className="space-y-1 pt-1">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton
-                      key={`g3-${i}`}
-                      className="h-8 w-full rounded-lg"
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : filteredGroups.length === 0 && searchQuery ? (
-            <div className="py-6 text-center text-xs text-muted-foreground font-medium">
-              Không tìm thấy bảng nào
-            </div>
-          ) : (
-            filteredGroups.map((group, groupIndex) => {
-              const isOpen =
-                Boolean(searchQuery) ||
-                (Boolean(currentTable) &&
-                  group.items.some(
-                    (item) => item.name.toLowerCase() === currentTable,
-                  )) ||
-                (openGroups[group.key] ?? true);
-              return (
-                <div key={group.key}>
-                  {groupIndex > 0 && (
-                    <Separator className="bg-border/40 my-2.5" />
-                  )}
-                  <div className="space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup(group.key)}
-                      className="flex items-center justify-between w-full px-2.5 py-1.5 text-xs font-semibold text-muted-foreground/80 hover:text-foreground rounded-md hover:bg-accent/40 transition-colors select-none cursor-pointer group"
-                    >
-                      <span className="truncate">{group.title}</span>
-                      <ChevronDown
-                        className={cn(
-                          "h-3.5 w-3.5 shrink-0 transition-transform duration-200 text-muted-foreground/60 group-hover:text-foreground",
-                          !isOpen && "-rotate-90",
-                        )}
+            {loading ? (
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-5 w-28 rounded-md" />
+                  <div className="space-y-1 pt-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Skeleton
+                        key={`g1-${i}`}
+                        className="h-8 w-full rounded-lg"
                       />
-                    </button>
-                    <div
-                      className={cn(
-                        "grid transition-all duration-200 ease-in-out",
-                        isOpen
-                          ? "grid-rows-[1fr] opacity-100"
-                          : "grid-rows-[0fr] opacity-0 pointer-events-none",
-                      )}
-                    >
-                      <div className="overflow-hidden space-y-0.5">
-                        {group.items.map((table) => {
-                          const href = `/portal/${table.name}`;
-                          const isActive = pathname === href;
-                          return (
-                            <Link
-                              key={table.name}
-                              href={href}
-                              onClick={closeMobileNav}
-                              className={cn(
-                                "flex items-center px-4 py-2 rounded-lg text-sm capitalize transition-all duration-200 relative group overflow-hidden",
-                                isActive
-                                  ? "bg-primary/10 text-primary font-semibold"
-                                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
-                              )}
-                            >
-                              {isActive && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-primary rounded-r-full" />
-                              )}
-                              {translateTableName(table.name)}
-                            </Link>
-                          );
-                        })}
+                    ))}
+                  </div>
+                </div>
+                <Separator className="bg-border/40" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-5 w-24 rounded-md" />
+                  <div className="space-y-1 pt-1">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                      <Skeleton
+                        key={`g2-${i}`}
+                        className="h-8 w-full rounded-lg"
+                      />
+                    ))}
+                  </div>
+                </div>
+                <Separator className="bg-border/40" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-5 w-36 rounded-md" />
+                  <div className="space-y-1 pt-1">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <Skeleton
+                        key={`g3-${i}`}
+                        className="h-8 w-full rounded-lg"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : filteredGroups.length === 0 && searchQuery ? (
+              <div className="py-6 text-center text-xs text-muted-foreground font-medium">
+                Không tìm thấy bảng nào
+              </div>
+            ) : (
+              filteredGroups.map((group, groupIndex) => {
+                const isOpen =
+                  Boolean(searchQuery) ||
+                  (Boolean(currentTable) &&
+                    group.items.some(
+                      (item) => item.name.toLowerCase() === currentTable,
+                    )) ||
+                  (openGroups[group.key] ?? true);
+                return (
+                  <div key={group.key}>
+                    {groupIndex > 0 && (
+                      <Separator className="bg-border/40 my-2.5" />
+                    )}
+                    <div className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(group.key)}
+                        className="flex items-center justify-between w-full px-2.5 py-1.5 text-xs font-semibold text-muted-foreground/80 hover:text-foreground rounded-md hover:bg-accent/40 transition-colors select-none cursor-pointer group"
+                      >
+                        <span className="truncate">{group.title}</span>
+                        <ChevronDown
+                          className={cn(
+                            "h-3.5 w-3.5 shrink-0 transition-transform duration-200 text-muted-foreground/60 group-hover:text-foreground",
+                            !isOpen && "-rotate-90",
+                          )}
+                        />
+                      </button>
+                      <div
+                        className={cn(
+                          "grid transition-all duration-200 ease-in-out",
+                          isOpen
+                            ? "grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0 pointer-events-none",
+                        )}
+                      >
+                        <div className="overflow-hidden space-y-0.5">
+                          {group.items.map((table) => {
+                            const href = `/portal/${table.name}`;
+                            const isActive = pathname === href;
+                            return (
+                              <Link
+                                key={table.name}
+                                href={href}
+                                onClick={closeMobileNav}
+                                className={cn(
+                                  "flex items-center px-4 py-2 rounded-lg text-sm capitalize transition-all duration-200 relative group overflow-hidden",
+                                  isActive
+                                    ? "bg-primary/10 text-primary font-semibold"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50",
+                                )}
+                              >
+                                {isActive && (
+                                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-primary rounded-r-full" />
+                                )}
+                                {translateTableName(table.name)}
+                              </Link>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          )}
-        </nav>
-      </ScrollArea>
+                );
+              })
+            )}
+          </nav>
+        </ScrollArea>
 
-      {/* Logout */}
-      <div className="border-t border-border/40 p-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2 h-10 px-4 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-          onClick={handleSignOut}
-          disabled={signingOut}
+        {/* Logout */}
+        <div className="border-t border-border/40 p-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 h-10 px-4 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+            onClick={handleSignOut}
+            disabled={signingOut}
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="font-medium">
+              {signingOut ? "Signing out…" : "Sign out"}
+            </span>
+          </Button>
+        </div>
+
+        {/* Drag handle - desktop only */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="hidden md:block absolute top-0 right-0 w-1.5 h-full cursor-col-resize group z-50 hover:bg-primary/50"
         >
-          <LogOut className="h-4 w-4" />
-          <span className="font-medium">
-            {signingOut ? "Signing out…" : "Sign out"}
-          </span>
-        </Button>
-      </div>
-
-      {/* Drag handle - desktop only */}
-      <div
-        onMouseDown={handleMouseDown}
-        className="hidden md:block absolute top-0 right-0 w-1.5 h-full cursor-col-resize group z-50 hover:bg-primary/50"
-      >
-        <div className="absolute right-0 top-0 h-full w-px bg-border/40 group-hover:bg-primary transition-colors" />
-      </div>
-    </aside>
-  </>
+          <div className="absolute right-0 top-0 h-full w-px bg-border/40 group-hover:bg-primary transition-colors" />
+        </div>
+      </aside>
+    </>
   );
 }
 

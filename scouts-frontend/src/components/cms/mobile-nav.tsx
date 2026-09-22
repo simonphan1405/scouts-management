@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -15,7 +21,9 @@ interface MobileNavContextType {
   toggle: () => void;
 }
 
-const MobileNavContext = createContext<MobileNavContextType | undefined>(undefined);
+const MobileNavContext = createContext<MobileNavContextType | undefined>(
+  undefined,
+);
 
 export function MobileNavProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

@@ -1,52 +1,24 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          );
-        },
-      },
-    },
-  );
-
-  // Refresh the session — do not add any logic between createServerClient and getUser()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const token = request.cookies.get("auth_token")?.value;
   const pathname = request.nextUrl.pathname;
 
-  // Protect /cms routes — redirect to /login if not authenticated
-  if (!user && pathname.startsWith("/portal")) {
+  // Bảo vệ route /portal — chuyển hướng về /login nếu chưa có token xác thực
+  if (!token && pathname.startsWith("/portal")) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     return NextResponse.redirect(loginUrl);
   }
 
-  // If authenticated and on /login, redirect to /cms
-  if (user && pathname === "/login") {
-    const cmsUrl = request.nextUrl.clone();
-    cmsUrl.pathname = "/portal";
-    return NextResponse.redirect(cmsUrl);
+  // Nếu đã có token và truy cập /login thì chuyển hướng vào /portal
+  if (token && pathname === "/login") {
+    const portalUrl = request.nextUrl.clone();
+    portalUrl.pathname = "/portal";
+    return NextResponse.redirect(portalUrl);
   }
 
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {

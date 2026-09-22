@@ -6,13 +6,7 @@ import {
   SCOUT_SECTIONS_LIST,
   type ScoutSectionInfo,
 } from "@/lib/constants/scout-theme";
-import {
-  Compass,
-  ChevronRight,
-  Award,
-  Users,
-  Flag,
-} from "lucide-react";
+import { Compass, ChevronRight, Award, Users, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BeaverIcon } from "@/components/ui/beaver-icon";
@@ -66,7 +60,8 @@ export function SectionsGrid({
             </span>
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Dữ liệu thực tế phân theo từng Ngành: Nhi (Cam), Ấu (Vàng), Thiếu (Xanh lá), Kha (Đỏ bầm), Tráng (Đỏ).
+            Dữ liệu thực tế phân theo từng Ngành: Nhi (Cam), Ấu (Vàng), Thiếu
+            (Xanh lá), Kha (Đỏ bầm), Tráng (Đỏ).
           </p>
         </div>
 
@@ -127,13 +122,13 @@ export function SectionsGrid({
               key={section.key}
               onClick={() => setSelectedKey(isSelected ? null : section.key)}
               className={`group relative flex flex-col justify-between rounded-xl border bg-card p-4 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-lg ${
-                isSelected
-                  ? "ring-2 shadow-md"
-                  : "hover:border-foreground/30"
+                isSelected ? "ring-2 shadow-md" : "hover:border-foreground/30"
               }`}
               style={{
                 borderColor: isSelected ? section.color : `${section.color}40`,
-                boxShadow: isSelected ? `0 0 0 2px ${section.color}` : undefined,
+                boxShadow: isSelected
+                  ? `0 0 0 2px ${section.color}`
+                  : undefined,
               }}
             >
               {/* Top Accent Bar with section color */}

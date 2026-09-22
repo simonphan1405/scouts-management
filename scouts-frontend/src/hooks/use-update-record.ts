@@ -1,46 +1,37 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { useMutation } from "@apollo/client/react";
-import { buildUpdateMutation } from "@/lib/graphql/query-builder";
-import type { ColumnMeta } from "@/lib/graphql/types";
+import { useCallback, useState } from "react";
+import { apiClient } from "@/lib/api-client";
 
-export function useUpdateRecord(tableName: string, columns: ColumnMeta[]) {
-  const columnKey = columns.map((c) => c.name).join(",");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const mutation = useMemo(() => buildUpdateMutation(tableName, columns), [tableName, columnKey]);
-  const [mutate, { loading, error }] = useMutation(mutation);
+export function useUpdateRecord(tableName: string) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  const cleanTableName = tableName
+    ? tableName.replace(/Collection$/i, "").toLowerCase()
+    : "";
 
   const updateRecord = useCallback(
-    (id: string, values: Record<string, unknown>) => {
-      const idCol = columns.find((c) => c.name === "id");
-      const idVal =
-        (idCol?.type === "BigInt" || idCol?.type === "Int") && !isNaN(Number(id))
-          ? Number(id)
-          : id;
+    async (id: string, values: Record<string, unknown>) => {
+      setLoading(true);
+      setError(undefined);
 
-      const writableColumns = columns.filter(
-        (c) => !["nodeId", "id", "created_at", "updated_at"].includes(c.name),
-      );
-
-      const cleanValues: Record<string, unknown> = {};
-      for (const col of writableColumns) {
-        if (values[col.name] !== undefined) {
-          let val = values[col.name];
-          if ((col.type === "BigInt" || col.type === "Int") && val !== null && val !== "") {
-            val = !isNaN(Number(val)) ? Number(val) : val;
-          } else if (val === "" && col.nullable) {
-            val = null;
-          }
-          cleanValues[col.name] = val;
-        }
+      try {
+        const result = await apiClient.put(
+          `/tables/${cleanTableName}/${id}`,
+          values,
+        );
+        return result;
+      } catch (err: any) {
+        const errorObj = err instanceof Error ? err : new Error(String(err));
+        setError(errorObj);
+        throw errorObj;
+      } finally {
+        setLoading(false);
       }
-
-      return mutate({ variables: { id: idVal, ...cleanValues } });
     },
-    [mutate, columns],
+    [cleanTableName],
   );
 
   return { updateRecord, loading, error };
 }
-

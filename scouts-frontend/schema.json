@@ -440,13 +440,7 @@
               "name": "founded_date"
             },
             {
-              "name": "council"
-            },
-            {
               "name": "districts"
-            },
-            {
-              "name": "councils"
             },
             {
               "name": "membersCollection"

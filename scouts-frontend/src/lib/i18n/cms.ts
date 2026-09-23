@@ -67,6 +67,7 @@ export const FIELD_TRANSLATIONS: Record<string, string> = {
   join_year: "Năm gia nhập",
   promise_year: "Năm tuyên hứa",
   current_section: "Ngành đang sinh hoạt",
+  previous_sections: "Ngành sinh hoạt trước đây",
   ranking: "Đẳng thứ",
 };
 

@@ -86,11 +86,35 @@ export function TableFilters({
       // 1. Collect distinct values directly from allRows
       for (const row of allRows) {
         const val = row[col.name];
-        if (val != null && String(val).trim() !== "") {
-          const strVal = String(val).trim();
-          const relMap = relationMaps[col.name];
-          const resolvedLabel = relMap?.get(strVal) ?? strVal;
-          optionsMap.set(strVal, resolvedLabel);
+        if (val != null) {
+          if (Array.isArray(val)) {
+            for (const item of val) {
+              const itemStr = String(item).trim();
+              if (itemStr) {
+                const relMap = relationMaps[col.name];
+                const resolvedLabel = relMap?.get(itemStr) ?? itemStr;
+                optionsMap.set(itemStr, resolvedLabel);
+              }
+            }
+          } else if (col.name === "previous_sections") {
+            const parts = String(val)
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            for (const part of parts) {
+              const relMap = relationMaps[col.name];
+              const resolvedLabel = relMap?.get(part) ?? part;
+              optionsMap.set(part, resolvedLabel);
+            }
+          } else {
+            const strVal = String(val).trim();
+            if (strVal !== "") {
+              const relMap = relationMaps[col.name];
+              const resolvedLabel =
+                relMap?.get(strVal) ?? strVal;
+              optionsMap.set(strVal, resolvedLabel);
+            }
+          }
         }
       }
 

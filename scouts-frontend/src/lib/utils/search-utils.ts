@@ -37,7 +37,22 @@ export function matchesSearch(
     if (rawValue == null) continue;
 
     // Add raw string
-    searchValues.push(String(rawValue));
+    if (Array.isArray(rawValue)) {
+      searchValues.push(rawValue.join(", "));
+    } else if (
+      typeof rawValue === "string" &&
+      col.name === "previous_sections"
+    ) {
+      searchValues.push(
+        rawValue
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .join(", "),
+      );
+    } else {
+      searchValues.push(String(rawValue));
+    }
 
     // If this is a foreign key, also add its resolved human-readable name
     const relMap = relationMaps[col.name];
@@ -75,6 +90,22 @@ export function matchesColumnFilters(
     const actualValue = row[colName];
     if (actualValue == null) {
       return false;
+    }
+
+    if (Array.isArray(actualValue)) {
+      const formatted = actualValue.join(", ");
+      if (formatted.toLowerCase() === expectedValue.trim().toLowerCase()) {
+        continue;
+      }
+      if (
+        actualValue.some(
+          (v) =>
+            String(v).trim().toLowerCase() ===
+            expectedValue.trim().toLowerCase(),
+        )
+      ) {
+        continue;
+      }
     }
 
     const actualStr = String(actualValue).trim();

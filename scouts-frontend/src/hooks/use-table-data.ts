@@ -40,7 +40,7 @@ export function useTableData(
         },
       );
       setRows(res.rows || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);

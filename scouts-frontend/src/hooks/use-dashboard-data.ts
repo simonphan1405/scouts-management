@@ -32,7 +32,7 @@ export function useDashboardData() {
         "/dashboard/overview",
       );
       setData(res);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);

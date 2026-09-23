@@ -27,8 +27,12 @@ export class AuthService {
     });
 
     if (error) {
-      this.logger.warn(`Đăng nhập thất bại cho email ${email}: ${error.message}`);
-      throw new UnauthorizedException(error.message || 'Thông tin đăng nhập không chính xác.');
+      this.logger.warn(
+        `Đăng nhập thất bại cho email ${email}: ${error.message}`,
+      );
+      throw new UnauthorizedException(
+        error.message || 'Thông tin đăng nhập không chính xác.',
+      );
     }
 
     return {
@@ -67,7 +71,7 @@ export class AuthService {
   /**
    * Đăng xuất người dùng
    */
-  async logout() {
+  logout() {
     return {
       message: 'Đăng xuất thành công.',
     };

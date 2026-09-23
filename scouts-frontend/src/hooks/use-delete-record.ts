@@ -21,7 +21,7 @@ export function useDeleteRecord(tableName: string) {
           `/tables/${cleanTableName}/${id}`,
         );
         return result;
-      } catch (err: any) {
+      } catch (err: unknown) {
         const errorObj = err instanceof Error ? err : new Error(String(err));
         setError(errorObj);
         throw errorObj;

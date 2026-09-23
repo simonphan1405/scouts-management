@@ -22,7 +22,13 @@ export default function LoginPage() {
       setLoading(true);
 
       try {
-        const res = await apiClient.post("/auth/login", {
+        interface LoginResponse {
+          user?: unknown;
+          session?: {
+            access_token?: string;
+          };
+        }
+        const res = await apiClient.post<LoginResponse>("/auth/login", {
           email,
           password,
         });
@@ -33,8 +39,12 @@ export default function LoginPage() {
 
         router.push("/portal");
         router.refresh();
-      } catch (err: any) {
-        setError(err.message || "Thông tin đăng nhập không chính xác.");
+      } catch (err: unknown) {
+        const errorMsg =
+          err instanceof Error
+            ? err.message
+            : "Thông tin đăng nhập không chính xác.";
+        setError(errorMsg);
         setLoading(false);
       }
     },

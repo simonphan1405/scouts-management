@@ -15,7 +15,6 @@ export function useTableList(): {
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
 
     apiClient
       .get<TableMeta[]>("/tables")
@@ -52,20 +51,25 @@ export function useTableSchema(tableOrTypeName: string): {
   loading: boolean;
   error: Error | undefined;
 } {
+  const [prevTableOrTypeName, setPrevTableOrTypeName] =
+    useState(tableOrTypeName);
   const [columns, setColumns] = useState<ColumnMeta[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(tableOrTypeName));
   const [error, setError] = useState<Error | undefined>(undefined);
+
+  if (tableOrTypeName !== prevTableOrTypeName) {
+    setPrevTableOrTypeName(tableOrTypeName);
+    setColumns([]);
+    setLoading(Boolean(tableOrTypeName));
+    setError(undefined);
+  }
 
   useEffect(() => {
     if (!tableOrTypeName) {
-      setColumns([]);
-      setLoading(false);
       return;
     }
 
     let isMounted = true;
-    setLoading(true);
-
     const tableName = tableOrTypeName.replace(/Collection$/i, "").toLowerCase();
 
     apiClient
@@ -84,9 +88,9 @@ export function useTableSchema(tableOrTypeName: string): {
           setLoading(false);
         }
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         if (isMounted) {
-          setError(err);
+          setError(err instanceof Error ? err : new Error(String(err)));
           setLoading(false);
         }
       });

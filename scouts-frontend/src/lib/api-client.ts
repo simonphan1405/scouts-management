@@ -41,7 +41,7 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
 
-async function request<T = any>(
+async function request<T = unknown>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<T> {
@@ -94,27 +94,35 @@ async function request<T = any>(
     return {} as T;
   }
 
-  return response.json();
+  return (await response.json()) as T;
 }
 
 export const apiClient = {
-  get: <T = any>(endpoint: string, options?: RequestOptions) =>
+  get: <T = unknown>(endpoint: string, options?: RequestOptions) =>
     request<T>(endpoint, { ...options, method: "GET" }),
 
-  post: <T = any>(endpoint: string, body?: any, options?: RequestOptions) =>
+  post: <T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ) =>
     request<T>(endpoint, {
       ...options,
       method: "POST",
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
 
-  put: <T = any>(endpoint: string, body?: any, options?: RequestOptions) =>
+  put: <T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ) =>
     request<T>(endpoint, {
       ...options,
       method: "PUT",
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
 
-  delete: <T = any>(endpoint: string, options?: RequestOptions) =>
+  delete: <T = unknown>(endpoint: string, options?: RequestOptions) =>
     request<T>(endpoint, { ...options, method: "DELETE" }),
 };

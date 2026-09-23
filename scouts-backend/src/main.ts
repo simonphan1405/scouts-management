@@ -8,4 +8,4 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`🚀 Scouts Backend đang chạy tại: http://localhost:${port}`);
 }
-bootstrap();
+void bootstrap();

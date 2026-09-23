@@ -69,7 +69,7 @@ export class TablesController {
   @Post(':tableName')
   createRecord(
     @Param('tableName') tableName: string,
-    @Body() payload: Record<string, any>,
+    @Body() payload: Record<string, unknown>,
   ) {
     return this.tablesService.createRecord(tableName, payload);
   }
@@ -81,7 +81,7 @@ export class TablesController {
   updateRecord(
     @Param('tableName') tableName: string,
     @Param('id') id: string,
-    @Body() payload: Record<string, any>,
+    @Body() payload: Record<string, unknown>,
   ) {
     return this.tablesService.updateRecord(tableName, id, payload);
   }
@@ -90,10 +90,7 @@ export class TablesController {
    * Xóa bản ghi theo ID
    */
   @Delete(':tableName/:id')
-  deleteRecord(
-    @Param('tableName') tableName: string,
-    @Param('id') id: string,
-  ) {
+  deleteRecord(@Param('tableName') tableName: string, @Param('id') id: string) {
     return this.tablesService.deleteRecord(tableName, id);
   }
 }

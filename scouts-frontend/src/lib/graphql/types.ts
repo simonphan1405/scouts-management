@@ -31,4 +31,5 @@ export interface ColumnMeta {
   nullable: boolean;
   /** If this column is a FK, the GraphQL collection field name of the related table (e.g. "councilsCollection") */
   relationTo?: string;
+  isMulti?: boolean;
 }

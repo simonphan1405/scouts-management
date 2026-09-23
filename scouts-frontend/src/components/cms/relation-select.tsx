@@ -10,6 +10,7 @@ interface RelationSelectProps {
   colType?: string;
   value: string;
   nullable: boolean;
+  disabled?: boolean;
   placeholder: string;
   onChange: (value: string | null) => void;
 }
@@ -21,6 +22,7 @@ export function RelationSelect({
   colType,
   value,
   nullable,
+  disabled = false,
   placeholder,
   onChange,
 }: RelationSelectProps) {
@@ -69,7 +71,7 @@ export function RelationSelect({
       name={name}
       value={selectedValue}
       required={!nullable}
-      disabled={loading}
+      disabled={disabled || loading}
       onChange={(e) => {
         const val = e.target.value;
         onChange(val === "" ? null : val);

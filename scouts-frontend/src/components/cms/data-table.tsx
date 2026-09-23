@@ -9,6 +9,7 @@ import {
 import { CmsHeader } from "./cms-header";
 import { TableFilters } from "./table-filters";
 import { RowActions } from "./row-actions";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -390,21 +391,51 @@ export function DataTable({ tableName }: DataTableProps) {
                     const rawValue = row[col.name];
                     // Resolve FK id → label if a relation map exists for this column
                     const relMap = relationMaps[col.name];
-                    const displayValue =
-                      relMap && rawValue != null
-                        ? (relMap.get(String(rawValue)) ?? String(rawValue))
-                        : rawValue != null
-                          ? String(rawValue)
-                          : null;
+                    let displayValue: string | null = null;
+                    if (rawValue != null) {
+                      if (Array.isArray(rawValue)) {
+                        displayValue = rawValue.join(", ");
+                      } else if (
+                        typeof rawValue === "string" &&
+                        col.name === "previous_sections"
+                      ) {
+                        displayValue = rawValue
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                          .join(", ");
+                      } else if (relMap) {
+                        displayValue =
+                          relMap.get(String(rawValue)) ?? String(rawValue);
+                      } else {
+                        displayValue = String(rawValue);
+                      }
+                    }
                     return (
                       <TableCell
                         key={col.name}
                         className="text-sm truncate overflow-hidden py-3"
                       >
-                        {displayValue == null ? (
+                        {displayValue == null || displayValue === "" ? (
                           <span className="text-muted-foreground/60 italic text-xs">
                             null
                           </span>
+                        ) : col.name === "previous_sections" ? (
+                          <div className="flex flex-wrap gap-1 items-center">
+                            {displayValue
+                              .split(",")
+                              .map((s) => s.trim())
+                              .filter(Boolean)
+                              .map((item) => (
+                                <Badge
+                                  key={item}
+                                  variant="secondary"
+                                  className="text-[11px] font-sans px-1.5 py-0 font-normal shrink-0"
+                                >
+                                  {relMap?.get(item) ?? item}
+                                </Badge>
+                              ))}
+                          </div>
                         ) : (
                           <span className="font-medium text-foreground/90">
                             {displayValue}

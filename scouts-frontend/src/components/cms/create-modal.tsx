@@ -55,7 +55,12 @@ export function CreateModal({
           </DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0 py-1 pr-1">
-          <RecordForm columns={columns} values={values} onChange={setValues} />
+          <RecordForm
+            tableName={tableName}
+            columns={columns}
+            values={values}
+            onChange={setValues}
+          />
         </div>
         <DialogFooter className="flex-col-reverse sm:flex-row gap-2 pt-2">
           <Button

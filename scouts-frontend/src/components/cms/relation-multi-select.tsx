@@ -136,7 +136,10 @@ export function RelationMultiSelect({
   };
 
   // Xóa 1 badge đã chọn
-  const handleRemoveValue = (valToRemove: string, e: React.MouseEvent) => {
+  const handleRemoveValue = (
+    valToRemove: string,
+    e: React.MouseEvent | React.KeyboardEvent,
+  ) => {
     e.stopPropagation();
     const nextValues = selectedValues.filter(
       (v) => v.toLowerCase() !== valToRemove.toLowerCase(),
@@ -176,6 +179,7 @@ export function RelationMultiSelect({
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
+        aria-controls={`${id}-listbox`}
         tabIndex={disabled ? -1 : 0}
         onClick={() => {
           if (!disabled) {
@@ -220,7 +224,7 @@ export function RelationMultiSelect({
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        handleRemoveValue(val, e as any);
+                        handleRemoveValue(val, e);
                       }
                     }}
                     className="rounded-full hover:bg-muted-foreground/20 p-0.5 cursor-pointer inline-flex items-center justify-center transition-colors"
@@ -308,6 +312,7 @@ export function RelationMultiSelect({
 
           {/* Options List */}
           <div
+            id={`${id}-listbox`}
             role="listbox"
             aria-multiselectable="true"
             className="max-h-56 overflow-y-auto space-y-0.5 p-0.5"

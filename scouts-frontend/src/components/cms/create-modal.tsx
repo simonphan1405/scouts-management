@@ -29,7 +29,7 @@ export function CreateModal({
 }: CreateModalProps) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, unknown>>({});
-  const { createRecord, loading } = useCreateRecord(tableName, columns);
+  const { createRecord, loading } = useCreateRecord(tableName);
 
   const handleCancel = useCallback(() => setOpen(false), []);
 

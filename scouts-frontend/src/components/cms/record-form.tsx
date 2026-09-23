@@ -43,6 +43,12 @@ const FULL_WIDTH_FIELDS = [
   "requirement",
 ];
 
+interface HierarchyItem {
+  id: string | number;
+  name?: string;
+  [key: string]: unknown;
+}
+
 export function RecordForm({
   tableName,
   columns,
@@ -52,20 +58,20 @@ export function RecordForm({
   const writableColumns = columns.filter((c) => !EXCLUDED.includes(c.name));
 
   const [hierarchyData, setHierarchyData] = useState<{
-    troops: any[];
-    groups: any[];
-    districts: any[];
-    units: any[];
+    troops: HierarchyItem[];
+    groups: HierarchyItem[];
+    districts: HierarchyItem[];
+    units: HierarchyItem[];
   }>({ troops: [], groups: [], districts: [], units: [] });
 
   useEffect(() => {
     if (tableName !== "members") return;
     let isMounted = true;
     Promise.all([
-      apiClient.get<{ rows: any[] }>("/tables/troops"),
-      apiClient.get<{ rows: any[] }>("/tables/groups"),
-      apiClient.get<{ rows: any[] }>("/tables/districts"),
-      apiClient.get<{ rows: any[] }>("/tables/units"),
+      apiClient.get<{ rows: HierarchyItem[] }>("/tables/troops"),
+      apiClient.get<{ rows: HierarchyItem[] }>("/tables/groups"),
+      apiClient.get<{ rows: HierarchyItem[] }>("/tables/districts"),
+      apiClient.get<{ rows: HierarchyItem[] }>("/tables/units"),
     ])
       .then(([tRes, gRes, dRes, uRes]) => {
         if (!isMounted) return;
@@ -232,7 +238,7 @@ export function RecordForm({
                   values[col.name] == null
                     ? ""
                     : Array.isArray(values[col.name])
-                      ? (values[col.name] as any[]).join(", ")
+                      ? (values[col.name] as unknown[]).join(", ")
                       : String(values[col.name])
                 }
                 onChange={(e) => {

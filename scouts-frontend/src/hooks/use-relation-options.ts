@@ -18,19 +18,23 @@ export function useRelationOptions(collectionField: string | undefined): {
   options: RelationOption[];
   loading: boolean;
 } {
+  const [prevField, setPrevField] = useState(collectionField);
   const [options, setOptions] = useState<RelationOption[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(Boolean(collectionField));
+
+  if (collectionField !== prevField) {
+    setPrevField(collectionField);
+    setOptions([]);
+    setLoading(Boolean(collectionField));
+  }
 
   useEffect(() => {
     if (!collectionField) {
-      setOptions([]);
-      setLoading(false);
       return;
     }
 
     const tableName = collectionField.replace(/Collection$/i, "").toLowerCase();
     let isMounted = true;
-    setLoading(true);
 
     apiClient
       .get<RelationOption[]>(`/tables/${tableName}/relations`)

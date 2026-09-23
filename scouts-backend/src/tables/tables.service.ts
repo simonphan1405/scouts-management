@@ -27,6 +27,46 @@ export interface RelationOption {
   label: string;
 }
 
+export interface RelationRow {
+  id: string | number;
+  name?: string | null;
+  full_name?: string | null;
+}
+
+export interface MemberRecord {
+  id?: string | number;
+  troop?: string | number | null;
+  unit?: string | number | null;
+  group?: string | number | null;
+  district?: string | number | null;
+  council?: string | number | null;
+  [key: string]: unknown;
+}
+
+export interface TroopItem {
+  id: string | number;
+  name?: string | null;
+  group?: string | number | null;
+}
+
+export interface GroupItem {
+  id: string | number;
+  name?: string | null;
+  district?: string | number | null;
+}
+
+export interface DistrictItem {
+  id: string | number;
+  name?: string | null;
+  council?: string | number | null;
+}
+
+export interface UnitItem {
+  id: string | number;
+  name?: string | null;
+  troop?: string | number | null;
+}
+
 // Định nghĩa Metadata cấu trúc các bảng CMS theo chuẩn Supabase Database
 const TABLE_METADATA: Record<
   string,
@@ -304,12 +344,13 @@ export class TablesService {
       );
     }
 
-    if (table === 'members' && data && data.length > 0) {
-      await this.enrichMembersWithHierarchy(data);
+    const rows = (data ?? []) as MemberRecord[];
+    if (table === 'members' && rows.length > 0) {
+      await this.enrichMembersWithHierarchy(rows);
     }
 
     return {
-      rows: data ?? [],
+      rows,
       total: count ?? 0,
       limit,
       offset,
@@ -322,7 +363,9 @@ export class TablesService {
    * - Đạo trực thuộc (district)
    * - Châu trực thuộc (council)
    */
-  async enrichMembersWithHierarchy(members: any[]): Promise<any[]> {
+  async enrichMembersWithHierarchy(
+    members: MemberRecord[],
+  ): Promise<MemberRecord[]> {
     if (!members || members.length === 0) return members;
 
     const supabase = this.supabaseService.getClient();
@@ -335,13 +378,13 @@ export class TablesService {
         supabase.from('Units').select('id, name, troop'),
       ]);
 
-      const troops = troopsRes.data || [];
-      const groups = groupsRes.data || [];
-      const districts = districtsRes.data || [];
-      const units = unitsRes.data || [];
+      const troops = (troopsRes.data || []) as TroopItem[];
+      const groups = (groupsRes.data || []) as GroupItem[];
+      const districts = (districtsRes.data || []) as DistrictItem[];
+      const units = (unitsRes.data || []) as UnitItem[];
 
       // Map troops by id and normalized name
-      const troopMap = new Map<string, any>();
+      const troopMap = new Map<string, TroopItem>();
       for (const t of troops) {
         troopMap.set(String(t.id), t);
         if (t.name) {
@@ -350,7 +393,7 @@ export class TablesService {
       }
 
       // Map groups by id and normalized name
-      const groupMap = new Map<string, any>();
+      const groupMap = new Map<string, GroupItem>();
       for (const g of groups) {
         groupMap.set(String(g.id), g);
         if (g.name) {
@@ -359,7 +402,7 @@ export class TablesService {
       }
 
       // Map districts by id and normalized name
-      const districtMap = new Map<string, any>();
+      const districtMap = new Map<string, DistrictItem>();
       for (const d of districts) {
         districtMap.set(String(d.id), d);
         if (d.name) {
@@ -368,7 +411,7 @@ export class TablesService {
       }
 
       // Map units by id and normalized name
-      const unitMap = new Map<string, any>();
+      const unitMap = new Map<string, UnitItem>();
       for (const u of units) {
         unitMap.set(String(u.id), u);
         if (u.name) {
@@ -425,9 +468,10 @@ export class TablesService {
           }
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       this.logger.warn(
-        `Lỗi khi làm giàu thông tin thành viên từ đoàn: ${err?.message}`,
+        `Lỗi khi làm giàu thông tin thành viên từ đoàn: ${error?.message || String(err)}`,
       );
     }
 
@@ -458,9 +502,10 @@ export class TablesService {
       return [];
     }
 
-    return (data ?? []).map((row: any) => {
+    const rows = (data ?? []) as RelationRow[];
+    return rows.map((row) => {
       const id = String(row.id);
-      const label = String(row.name ?? row.full_name ?? id);
+      const label = row.name ?? row.full_name ?? id;
       return {
         id,
         name: label,
@@ -473,16 +518,23 @@ export class TablesService {
   /**
    * Lấy chi tiết một bản ghi theo ID
    */
-  async getRecordById(rawName: string, id: string | number) {
+  async getRecordById(
+    rawName: string,
+    id: string | number,
+  ): Promise<Record<string, unknown> | null> {
     const table = this.normalizeTableName(rawName);
     const dbTable = this.getDbTableName(rawName);
     const supabase = this.supabaseService.getClient();
 
-    const { data, error } = await supabase
+    const res = (await supabase
       .from(dbTable)
       .select('*')
       .eq('id', id)
-      .single();
+      .single()) as {
+      data: MemberRecord | null;
+      error: { code?: string; message: string } | null;
+    };
+    const { data, error } = res;
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -509,18 +561,21 @@ export class TablesService {
   /**
    * Tạo bản ghi mới trong bảng
    */
-  async createRecord(rawName: string, payload: Record<string, any>) {
+  async createRecord(
+    rawName: string,
+    payload: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const table = this.normalizeTableName(rawName);
     const dbTable = this.getDbTableName(rawName);
     const supabase = this.supabaseService.getClient();
     const schema = this.getTableSchema(table);
 
-    const cleanData: Record<string, any> = {};
+    const cleanData: Record<string, unknown> = {};
     for (const col of schema) {
       if (['id', 'created_at', 'updated_at', 'nodeId'].includes(col.name))
         continue;
       if (payload[col.name] !== undefined) {
-        let val = payload[col.name];
+        let val: unknown = payload[col.name];
         if (val === '' && col.nullable) {
           val = null;
         } else if (
@@ -530,7 +585,7 @@ export class TablesService {
         ) {
           val = !isNaN(Number(val)) ? Number(val) : val;
         } else if (col.type === 'Float' && val !== null && val !== '') {
-          val = !isNaN(Number(val)) ? parseFloat(val) : val;
+          val = !isNaN(Number(val)) ? Number(val) : val;
         }
         cleanData[col.name] = val;
       }
@@ -549,28 +604,33 @@ export class TablesService {
           : [];
       } else if (Array.isArray(cleanData.previous_sections)) {
         cleanData.previous_sections = cleanData.previous_sections
-          .map((s: any) => String(s).trim())
+          .map((s: unknown) => String(s).trim())
           .filter(Boolean);
       }
     }
 
-    const { data, error } = await supabase
+    const res = (await supabase
       .from(dbTable)
       .insert(cleanData)
       .select()
-      .single();
+      .single()) as {
+      data: MemberRecord | null;
+      error: { message: string } | null;
+    };
+    const { data, error } = res;
 
-    if (error) {
+    if (error || !data) {
+      const msg = error?.message || 'Không có dữ liệu trả về';
       this.logger.error(
-        `Lỗi tạo bản ghi trong ${dbTable} (${table}): ${error.message}`,
+        `Lỗi tạo bản ghi trong ${dbTable} (${table}): ${msg}`,
         error,
       );
       throw new InternalServerErrorException(
-        `Không thể tạo bản ghi trong ${table}: ${error.message}`,
+        `Không thể tạo bản ghi trong ${table}: ${msg}`,
       );
     }
 
-    if (table === 'members' && data) {
+    if (table === 'members') {
       await this.enrichMembersWithHierarchy([data]);
     }
 
@@ -583,19 +643,19 @@ export class TablesService {
   async updateRecord(
     rawName: string,
     id: string | number,
-    payload: Record<string, any>,
-  ) {
+    payload: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     const table = this.normalizeTableName(rawName);
     const dbTable = this.getDbTableName(rawName);
     const supabase = this.supabaseService.getClient();
     const schema = this.getTableSchema(table);
 
-    const cleanData: Record<string, any> = {};
+    const cleanData: Record<string, unknown> = {};
     for (const col of schema) {
       if (['id', 'created_at', 'updated_at', 'nodeId'].includes(col.name))
         continue;
       if (payload[col.name] !== undefined) {
-        let val = payload[col.name];
+        let val: unknown = payload[col.name];
         if (val === '' && col.nullable) {
           val = null;
         } else if (
@@ -605,7 +665,7 @@ export class TablesService {
         ) {
           val = !isNaN(Number(val)) ? Number(val) : val;
         } else if (col.type === 'Float' && val !== null && val !== '') {
-          val = !isNaN(Number(val)) ? parseFloat(val) : val;
+          val = !isNaN(Number(val)) ? Number(val) : val;
         }
         cleanData[col.name] = val;
       }
@@ -624,29 +684,34 @@ export class TablesService {
           : [];
       } else if (Array.isArray(cleanData.previous_sections)) {
         cleanData.previous_sections = cleanData.previous_sections
-          .map((s: any) => String(s).trim())
+          .map((s: unknown) => String(s).trim())
           .filter(Boolean);
       }
     }
 
-    const { data, error } = await supabase
+    const res = (await supabase
       .from(dbTable)
       .update(cleanData)
       .eq('id', id)
       .select()
-      .single();
+      .single()) as {
+      data: MemberRecord | null;
+      error: { message: string } | null;
+    };
+    const { data, error } = res;
 
-    if (error) {
+    if (error || !data) {
+      const msg = error?.message || 'Không có dữ liệu trả về';
       this.logger.error(
-        `Lỗi cập nhật bản ghi ${id} trong ${dbTable} (${table}): ${error.message}`,
+        `Lỗi cập nhật bản ghi ${id} trong ${dbTable} (${table}): ${msg}`,
         error,
       );
       throw new InternalServerErrorException(
-        `Không thể cập nhật bản ghi trong ${table}: ${error.message}`,
+        `Không thể cập nhật bản ghi trong ${table}: ${msg}`,
       );
     }
 
-    if (table === 'members' && data) {
+    if (table === 'members') {
       await this.enrichMembersWithHierarchy([data]);
     }
 

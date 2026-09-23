@@ -2,9 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { apiClient } from "@/lib/api-client";
-import type { ColumnMeta } from "@/lib/graphql/types";
 
-export function useCreateRecord(tableName: string, columns: ColumnMeta[]) {
+export function useCreateRecord(tableName: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
 
@@ -23,7 +22,7 @@ export function useCreateRecord(tableName: string, columns: ColumnMeta[]) {
           values,
         );
         return result;
-      } catch (err: any) {
+      } catch (err: unknown) {
         const errorObj = err instanceof Error ? err : new Error(String(err));
         setError(errorObj);
         throw errorObj;

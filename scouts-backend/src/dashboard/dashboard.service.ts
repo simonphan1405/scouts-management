@@ -36,6 +36,37 @@ const SECTION_NAME_MAP: Record<string, string> = {
   trang: 'Tráng',
 };
 
+interface MemberRow {
+  id: string | number;
+  full_name?: string | null;
+  current_section?: string | null;
+  role?: string | null;
+}
+
+interface TroopRow {
+  id: string | number;
+  name?: string | null;
+  section?: string | null;
+}
+
+interface RankingRow {
+  id: string | number;
+  name?: string | null;
+  level?: number | string | null;
+  section?: string | null;
+}
+
+interface ExpenseRow {
+  id: string | number;
+  amount?: number | string | null;
+  purpose?: string | null;
+}
+
+interface NamedRow {
+  id: string | number;
+  name?: string | null;
+}
+
 @Injectable()
 export class DashboardService {
   private readonly logger = new Logger(DashboardService.name);
@@ -75,16 +106,16 @@ export class DashboardService {
       ]);
 
       // Trích xuất mảng dữ liệu an toàn
-      const memberList = membersRes.data ?? [];
-      const sectionList = sectionsRes.data ?? [];
-      const councilList = councilsRes.data ?? [];
-      const districtList = districtsRes.data ?? [];
-      const groupList = groupsRes.data ?? [];
-      const troopList = troopsRes.data ?? [];
-      const unitList = unitsRes.data ?? [];
-      const rankingList = rankingsRes.data ?? [];
-      const expenseList = expensesRes.data ?? [];
-      const religionList = religionsRes.data ?? [];
+      const memberList = (membersRes.data ?? []) as MemberRow[];
+      const sectionList = (sectionsRes.data ?? []) as NamedRow[];
+      const councilList = (councilsRes.data ?? []) as NamedRow[];
+      const districtList = (districtsRes.data ?? []) as NamedRow[];
+      const groupList = (groupsRes.data ?? []) as NamedRow[];
+      const troopList = (troopsRes.data ?? []) as TroopRow[];
+      const unitList = (unitsRes.data ?? []) as NamedRow[];
+      const rankingList = (rankingsRes.data ?? []) as RankingRow[];
+      const expenseList = (expensesRes.data ?? []) as ExpenseRow[];
+      const religionList = (religionsRes.data ?? []) as NamedRow[];
 
       const memberCount = memberList.length;
       const sectionCount = sectionList.length;
@@ -120,11 +151,11 @@ export class DashboardService {
         );
 
         // Lấy danh sách đẳng thứ theo ngành và sắp xếp theo cấp bậc
-        const rankingsInSection = rankingList
+        const rankingsInSection: string[] = rankingList
           .filter((r) => r.section?.toLowerCase() === nameLower)
           .sort((a, b) => (Number(a.level) || 0) - (Number(b.level) || 0))
           .map((r) => r.name || '')
-          .filter(Boolean);
+          .filter((name): name is string => Boolean(name));
 
         const memberNum = membersInSection.length;
         const percentage =
@@ -161,13 +192,15 @@ export class DashboardService {
         sectionStats,
         tableCounts,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as Error;
+      const errorMsg = err?.message || String(error);
       this.logger.error(
-        `Lỗi tổng hợp số liệu Dashboard: ${error.message}`,
-        error,
+        `Lỗi tổng hợp số liệu Dashboard: ${errorMsg}`,
+        err?.stack,
       );
       throw new InternalServerErrorException(
-        `Không thể tổng hợp số liệu thống kê: ${error.message}`,
+        `Không thể tổng hợp số liệu thống kê: ${errorMsg}`,
       );
     }
   }

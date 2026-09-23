@@ -23,7 +23,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout() {
+  logout() {
     return this.authService.logout();
   }
 

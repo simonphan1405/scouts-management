@@ -1,0 +1,99 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Path Filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'scouts-backend/**'
+              - '.github/workflows/cd.yml'
+            frontend:
+              - 'scouts-frontend/**'
+              - '.github/workflows/cd.yml'
+
+  deploy-backend:
+    name: Deploy Backend (Render)
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deployment
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::notice title=Render Deploy Hook Not Set::RENDER_BACKEND_DEPLOY_HOOK secret is not configured in repository settings. Skipping Render deployment trigger."
+            echo "### Render Deployment Notice" >> $GITHUB_STEP_SUMMARY
+            echo "Backend deployment was skipped because \`RENDER_BACKEND_DEPLOY_HOOK\` secret is not yet set." >> $GITHUB_STEP_SUMMARY
+            echo "To configure, obtain the Deploy Hook URL from your Render service settings and add it as a secret in GitHub." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          echo "Triggering deployment on Render for branch '${{ github.ref_name }}'..."
+          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "Render deploy hook triggered successfully (HTTP $HTTP_CODE)."
+            echo "### Render Deployment Success" >> $GITHUB_STEP_SUMMARY
+            echo "Render deployment triggered successfully for branch \`${{ github.ref_name }}\`." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Failed to trigger Render deploy hook. HTTP status: $HTTP_CODE"
+            cat response.json
+            exit 1
+          fi
+
+  deploy-frontend:
+    name: Deploy Frontend (Vercel)
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: ${{ github.ref_name == 'main' && '--prod' || '' }}
+          working-directory: ./scouts-frontend
+
+      - name: Vercel Setup Notice
+        if: ${{ secrets.VERCEL_TOKEN == '' }}
+        run: |
+          echo "::notice title=Vercel Deployment Skipped::Vercel secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID) are not set. Skipping Vercel automated deployment."
+          echo "### Vercel Deployment Notice" >> $GITHUB_STEP_SUMMARY
+          echo "Frontend deployment was skipped because Vercel secrets are not yet configured." >> $GITHUB_STEP_SUMMARY
+          echo "To enable automated Vercel deployment from GitHub Actions:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Create a project in Vercel with Root Directory set to \`scouts-frontend\`." >> $GITHUB_STEP_SUMMARY
+          echo "2. Add \`VERCEL_TOKEN\`, \`VERCEL_ORG_ID\`, and \`VERCEL_PROJECT_ID\` to GitHub repository secrets." >> $GITHUB_STEP_SUMMARY

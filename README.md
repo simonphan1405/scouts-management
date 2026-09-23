@@ -1,5 +1,8 @@
 # ⚜️ Scouts Management (Hệ Thống Quản Lý Hướng Đạo)
 
+[![CI](https://github.com/simonphan1405/scouts-management/actions/workflows/ci.yml/badge.svg)](https://github.com/simonphan1405/scouts-management/actions/workflows/ci.yml)
+[![CD](https://github.com/simonphan1405/scouts-management/actions/workflows/cd.yml/badge.svg)](https://github.com/simonphan1405/scouts-management/actions/workflows/cd.yml)
+
 Hệ thống quản trị và quản lý thông tin toàn diện dành cho các đơn vị Hướng đạo, hỗ trợ theo dõi cơ cấu tổ chức, thành viên, ngành sinh hoạt, đẳng thứ, chức vụ và thu chi.
 
 ---
@@ -15,6 +18,7 @@ Hệ thống quản trị và quản lý thông tin toàn diện dành cho các 
   - [Cách 2: Chạy trực tiếp trên máy (Development)](#cách-2-chạy-trực-tiếp-trên-máy-development)
 - [Cấu Hình Biến Môi Trường](#-cấu-hình-biến-môi-trường)
 - [Cơ Sở Dữ Liệu](#-cơ-sở-dữ-liệu)
+- [CI/CD & Triển Khai](#-cicd--triển-khai)
 
 ---
 
@@ -214,6 +218,47 @@ Frontend sẽ chạy tại: `http://localhost:3000`.
 
 ---
 
+## 🔄 CI/CD & Triển Khai
+
+Dự án sử dụng **GitHub Actions** để tự động hoá quy trình kiểm thử (CI) và triển khai (CD).
+
+### 1. Continuous Integration (CI) - `.github/workflows/ci.yml`
+
+Tự động kích hoạt khi có Pull Request hoặc Push vào nhánh `develop` và `main`:
+- **Detect Changes**: Sử dụng path filtering để chỉ chạy job tương ứng khi có thay đổi code.
+- **Backend CI**: Kiểm tra lint (`eslint`), chạy unit tests (`jest`), và build NestJS (`nest build`).
+- **Frontend CI**: Kiểm tra lint (`next lint`), kiểm tra kiểu (`tsc`), và build Next.js Standalone (`next build`).
+- **Docker Build Check**: Kiểm tra build Docker image của cả 2 dịch vụ trên mỗi PR để đảm bảo không bị lỗi containerization.
+
+### 2. Continuous Delivery (CD) - `.github/workflows/cd.yml`
+
+Tự động kích hoạt khi merge/push vào `develop` (staging) hoặc `main` (production):
+- **Backend (Render)**:
+  - Khi code trong `scouts-backend/` thay đổi, workflow sẽ gọi Deploy Hook của Render để kích hoạt tiến trình build Docker tự động.
+  - Secret cần thiết lập: `RENDER_BACKEND_DEPLOY_HOOK` (lấy tại *Render Dashboard > scouts-backend > Settings > Deploy Hook*).
+- **Frontend (Vercel)**:
+  - Khi code trong `scouts-frontend/` thay đổi, workflow hỗ trợ deploy tự động lên Vercel.
+  - Hỗ trợ triển khai Preview (nhánh `develop`) và Production (nhánh `main`).
+  - Secrets cần thiết lập (tuỳ chọn khi dùng GitHub Action deploy):
+    - `VERCEL_TOKEN`: Personal access token của Vercel
+    - `VERCEL_ORG_ID`: ID tổ chức / tài khoản Vercel
+    - `VERCEL_PROJECT_ID`: ID project Vercel
+  *(Lưu ý: Nếu chưa cấu hình secrets Vercel hoặc kết nối trực tiếp Vercel qua GitHub repo UI, bước này sẽ tự động bỏ qua an toàn và hiển thị thông báo hướng dẫn trong Job Summary).*
+
+### 3. Cấu hình Secrets trên GitHub
+
+Vào repository GitHub: **Settings** > **Secrets and variables** > **Actions** > **New repository secret**:
+
+| Secret Name | Mô tả | Bắt buộc |
+| :--- | :--- | :--- |
+| `RENDER_BACKEND_DEPLOY_HOOK` | URL deploy hook từ Render cho `scouts-backend` | Khuyến nghị cho Backend CD |
+| `VERCEL_TOKEN` | Token xác thực Vercel CLI / Action | Tuỳ chọn cho Frontend CD qua Action |
+| `VERCEL_ORG_ID` | Team / Account ID trên Vercel | Tuỳ chọn |
+| `VERCEL_PROJECT_ID` | Project ID trên Vercel | Tuỳ chọn |
+
+---
+
 ## 📄 Bản Quyền
 
 Dự án phát triển cho mục đích quản lý sinh hoạt Hướng đạo. Mọi đóng góp và phản hồi xin vui lòng tạo issue hoặc pull request.
+

@@ -25,7 +25,7 @@ services:
       context: ./scouts-frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: scouts-frontend
     restart: unless-stopped
     ports:
@@ -33,9 +33,11 @@ services:
     environment:
       - PORT=3000
       - HOSTNAME=0.0.0.0
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     env_file:
       - path: ./scouts-frontend/.env.local
+        required: false
+      - path: ./scouts-frontend/.env
         required: false
       - path: .env
         required: false

@@ -37,6 +37,26 @@ export function removeToken() {
   localStorage.removeItem(TOKEN_COOKIE_NAME);
 }
 
+export class ApiError extends Error {
+  status: number;
+  data?: unknown;
+
+  constructor(message: string, status: number, data?: unknown) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.data = data;
+  }
+
+  get isClientError(): boolean {
+    return this.status >= 400 && this.status < 500;
+  }
+
+  get isServerError(): boolean {
+    return this.status >= 500;
+  }
+}
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
@@ -73,20 +93,39 @@ async function request<T = unknown>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
-    ...rest,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...rest,
+      headers,
+    });
+  } catch (netErr: unknown) {
+    const message =
+      netErr instanceof Error
+        ? netErr.message
+        : "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.";
+    throw new ApiError(message, 0);
+  }
 
   if (!response.ok) {
     let errorMsg = `Yêu cầu thất bại với mã lỗi ${response.status}`;
+    let errBody: unknown = null;
     try {
-      const errBody = await response.json();
-      errorMsg = errBody.message || errBody.error || errorMsg;
+      errBody = await response.json();
+      if (errBody && typeof errBody === "object") {
+        const bodyObj = errBody as Record<string, unknown>;
+        if (Array.isArray(bodyObj.message)) {
+          errorMsg = bodyObj.message.join(", ");
+        } else if (typeof bodyObj.message === "string") {
+          errorMsg = bodyObj.message;
+        } else if (typeof bodyObj.error === "string") {
+          errorMsg = bodyObj.error;
+        }
+      }
     } catch {
       // Ignored
     }
-    throw new Error(errorMsg);
+    throw new ApiError(errorMsg, response.status, errBody);
   }
 
   // Handle 204 No Content

@@ -27,10 +27,13 @@ import {
   ChevronsLeft,
   ChevronsRight,
   RotateCcw,
+  AlertTriangle,
 } from "lucide-react";
-import { translateField } from "@/lib/i18n";
+import { translateField, translateTableName } from "@/lib/i18n";
 import { useRelationMap } from "@/hooks/use-relation-map";
 import { matchesSearch, matchesColumnFilters } from "@/lib/utils/search-utils";
+import { toast } from "@/components/ui/toast";
+import { formatUserFriendlyMessage } from "@/lib/utils/error-formatter";
 
 interface DataTableProps {
   tableName: string;
@@ -73,10 +76,22 @@ export function DataTable({ tableName }: DataTableProps) {
   const {
     rows: allRows,
     loading: dataLoading,
+    error: dataError,
     refetch,
   } = useTableData(collectionField, columns);
 
   const loading = schemaLoading || (dataLoading && allRows.length === 0);
+
+  // Notify on data fetch error
+  useEffect(() => {
+    if (dataError) {
+      const friendlyMsg = formatUserFriendlyMessage(dataError, {
+        action: "read",
+        tableName,
+      });
+      toast.error("Chưa thể tải dữ liệu", friendlyMsg);
+    }
+  }, [dataError, tableName]);
 
   // ---- Relation label maps for FK columns ----
   const { relationMaps } = useRelationMap(columns);
@@ -168,6 +183,21 @@ export function DataTable({ tableName }: DataTableProps) {
     refetch();
   }, [refetch]);
 
+  const handleRefresh = useCallback(async () => {
+    try {
+      await refetch();
+      toast.success(
+        "Làm mới thành công!",
+        `Đã tải lại dữ liệu mới nhất cho danh mục ${translateTableName(tableName)}.`,
+      );
+    } catch (err: unknown) {
+      toast.error(
+        "Lỗi làm mới dữ liệu",
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+  }, [refetch, tableName]);
+
   // ---- Column resize state ----
   const [customWidths, setCustomWidths] = useState<Record<number, number>>({});
   const dragState = useRef<{
@@ -238,6 +268,8 @@ export function DataTable({ tableName }: DataTableProps) {
         tableName={tableName}
         columns={columns}
         onCreated={handleCreated}
+        onRefresh={handleRefresh}
+        loading={dataLoading}
       />
 
       {/* Filter and Search Toolbar */}
@@ -346,6 +378,35 @@ export function DataTable({ tableName }: DataTableProps) {
                   <TableCell />
                 </TableRow>
               ))
+            ) : dataError ? (
+              <TableRow>
+                <TableCell
+                  colSpan={displayColumns.length + 2}
+                  className="h-48 text-center text-destructive py-8"
+                >
+                  <div className="flex flex-col items-center justify-center gap-2.5 max-w-md mx-auto">
+                    <AlertTriangle className="h-8 w-8 text-destructive animate-pulse" />
+                    <p className="font-semibold text-sm">
+                      Không thể tải dữ liệu bảng {translateTableName(tableName)}
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-sm">
+                      {formatUserFriendlyMessage(dataError, {
+                        action: "read",
+                        tableName,
+                      })}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => refetch()}
+                      className="mt-2 text-xs gap-1.5 cursor-pointer border-destructive/30 hover:bg-destructive/10 text-foreground"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Thử lại
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : totalCount === 0 ? (
               <TableRow>
                 <TableCell

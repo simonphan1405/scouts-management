@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -76,7 +77,7 @@ const TABLE_METADATA: Record<
     typeName: 'Councils',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'address', type: 'String', nullable: true },
       { name: 'description', type: 'String', nullable: true },
       { name: 'founded_date', type: 'Date', nullable: true },
@@ -86,7 +87,7 @@ const TABLE_METADATA: Record<
     typeName: 'Districts',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'address', type: 'String', nullable: true },
       { name: 'description', type: 'String', nullable: true },
       { name: 'founded_date', type: 'Date', nullable: true },
@@ -102,7 +103,7 @@ const TABLE_METADATA: Record<
     typeName: 'Groups',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'address', type: 'String', nullable: true },
       { name: 'description', type: 'String', nullable: true },
       { name: 'founded_date', type: 'Date', nullable: true },
@@ -118,7 +119,7 @@ const TABLE_METADATA: Record<
     typeName: 'Troops',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'address', type: 'String', nullable: true },
       { name: 'description', type: 'String', nullable: true },
       { name: 'founded_date', type: 'Date', nullable: true },
@@ -140,7 +141,7 @@ const TABLE_METADATA: Record<
     typeName: 'Units',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'description', type: 'String', nullable: true },
       { name: 'unit_type', type: 'String', nullable: true },
       {
@@ -155,7 +156,7 @@ const TABLE_METADATA: Record<
     typeName: 'Sections',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'description', type: 'String', nullable: true },
       { name: 'min_age', type: 'Int', nullable: true },
       { name: 'max_age', type: 'Int', nullable: true },
@@ -166,7 +167,7 @@ const TABLE_METADATA: Record<
     typeName: 'Rankings',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'level', type: 'Int', nullable: true },
       { name: 'requirement', type: 'String', nullable: true },
       {
@@ -182,7 +183,7 @@ const TABLE_METADATA: Record<
     typeName: 'Members',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'full_name', type: 'String', nullable: true },
+      { name: 'full_name', type: 'String', nullable: false },
       { name: 'gender', type: 'String', nullable: true },
       { name: 'date_of_birth', type: 'Date', nullable: true },
       { name: 'identification_number', type: 'String', nullable: true },
@@ -256,7 +257,7 @@ const TABLE_METADATA: Record<
         nullable: true,
         relationTo: 'membersCollection',
       },
-      { name: 'amount', type: 'Float', nullable: true },
+      { name: 'amount', type: 'Float', nullable: false },
       { name: 'purpose', type: 'String', nullable: true },
       { name: 'payment_date', type: 'Date', nullable: true },
       { name: 'notes', type: 'String', nullable: true },
@@ -267,7 +268,7 @@ const TABLE_METADATA: Record<
     typeName: 'Religions',
     columns: [
       { name: 'id', type: 'BigInt', nullable: false },
-      { name: 'name', type: 'String', nullable: true },
+      { name: 'name', type: 'String', nullable: false },
       { name: 'code', type: 'String', nullable: true },
       { name: 'description', type: 'String', nullable: true },
     ],
@@ -615,7 +616,7 @@ export class TablesService {
       .select()
       .single()) as {
       data: MemberRecord | null;
-      error: { message: string } | null;
+      error: { message: string; code?: string } | null;
     };
     const { data, error } = res;
 
@@ -625,9 +626,7 @@ export class TablesService {
         `Lỗi tạo bản ghi trong ${dbTable} (${table}): ${msg}`,
         error,
       );
-      throw new InternalServerErrorException(
-        `Không thể tạo bản ghi trong ${table}: ${msg}`,
-      );
+      throw this.formatDbError('create', rawName, error);
     }
 
     if (table === 'members') {
@@ -696,7 +695,7 @@ export class TablesService {
       .select()
       .single()) as {
       data: MemberRecord | null;
-      error: { message: string } | null;
+      error: { message: string; code?: string } | null;
     };
     const { data, error } = res;
 
@@ -706,9 +705,7 @@ export class TablesService {
         `Lỗi cập nhật bản ghi ${id} trong ${dbTable} (${table}): ${msg}`,
         error,
       );
-      throw new InternalServerErrorException(
-        `Không thể cập nhật bản ghi trong ${table}: ${msg}`,
-      );
+      throw this.formatDbError('update', rawName, error);
     }
 
     if (table === 'members') {
@@ -733,14 +730,119 @@ export class TablesService {
         `Lỗi xóa bản ghi ${id} trong ${dbTable} (${table}): ${error.message}`,
         error,
       );
-      throw new InternalServerErrorException(
-        `Không thể xóa bản ghi trong ${table}: ${error.message}`,
-      );
+      throw this.formatDbError('delete', rawName, error);
     }
 
     return {
       success: true,
       message: `Đã xóa bản ghi ${id} thành công.`,
     };
+  }
+
+  /**
+   * Định dạng lỗi cơ sở dữ liệu thành thông báo thân thiện với người dùng
+   */
+  private formatDbError(
+    action: 'create' | 'update' | 'delete',
+    rawName: string,
+    error: { code?: string; message?: string; details?: string } | null,
+  ): Error {
+    const table = this.normalizeTableName(rawName);
+    const tableNamesVi: Record<string, string> = {
+      councils: 'Châu',
+      districts: 'Đạo',
+      groups: 'Liên đoàn',
+      troops: 'Đoàn',
+      units: 'Đội / Bầy',
+      sections: 'Ngành',
+      rankings: 'Đẳng thứ',
+      members: 'Đoàn sinh / Thành viên',
+      expenses: 'Khoản thu chi',
+      religions: 'Tôn giáo',
+    };
+    const tableTitle = tableNamesVi[table] || table;
+    const msg = (error?.message || '').toLowerCase();
+    const details = (error?.details || '').toLowerCase();
+    const code = error?.code || '';
+
+    // 1. Vi phạm ràng buộc khóa ngoại (Foreign key constraint violation)
+    if (
+      code === '23503' ||
+      msg.includes('foreign key constraint') ||
+      details.includes('still referenced')
+    ) {
+      let referencing = '';
+      if (msg.includes('districts') || details.includes('districts'))
+        referencing = 'Đạo';
+      else if (msg.includes('groups') || details.includes('groups'))
+        referencing = 'Liên đoàn';
+      else if (msg.includes('troops') || details.includes('troops'))
+        referencing = 'Đoàn';
+      else if (msg.includes('units') || details.includes('units'))
+        referencing = 'Đội / Bầy';
+      else if (msg.includes('members') || details.includes('members'))
+        referencing = 'Đoàn sinh';
+      else if (msg.includes('expenses') || details.includes('expenses'))
+        referencing = 'Khoản thu chi';
+      else if (msg.includes('rankings') || details.includes('rankings'))
+        referencing = 'Đẳng thứ';
+
+      if (action === 'delete') {
+        if (referencing) {
+          return new BadRequestException(
+            `Không thể xóa ${tableTitle} này vì hiện đang có các ${referencing} trực thuộc liên kết đến. Vui lòng chuyển hoặc xóa các ${referencing} này trước khi xóa ${tableTitle}.`,
+          );
+        }
+        return new BadRequestException(
+          `Không thể xóa ${tableTitle} này vì dữ liệu đang được liên kết và sử dụng ở danh mục khác. Vui lòng kiểm tra và hủy liên kết trước khi xóa.`,
+        );
+      }
+      return new BadRequestException(
+        `Thông tin liên kết không hợp lệ hoặc mục được chọn không tồn tại trong hệ thống.`,
+      );
+    }
+
+    // 2. Vi phạm trường bắt buộc (Not-null constraint)
+    if (
+      code === '23502' ||
+      msg.includes('violates not-null constraint') ||
+      msg.includes('null value in column')
+    ) {
+      const colMatch = (error?.message || '').match(
+        /column\s+"?([A-Za-z0-9_]+)"?/i,
+      );
+      const colName = colMatch ? colMatch[1] : '';
+      const fieldMap: Record<string, string> = {
+        name: 'Tên',
+        full_name: 'Họ và tên',
+        amount: 'Số tiền',
+        address: 'Địa chỉ',
+      };
+      const colLabel = fieldMap[colName.toLowerCase()] || colName || 'bắt buộc';
+      return new BadRequestException(
+        `Thông tin bắt buộc: Vui lòng nhập trường "${colLabel}" trước khi lưu.`,
+      );
+    }
+
+    // 3. Trùng lặp dữ liệu (Unique constraint violation)
+    if (
+      code === '23505' ||
+      msg.includes('unique constraint') ||
+      msg.includes('duplicate key')
+    ) {
+      return new BadRequestException(
+        `Thông tin bạn vừa nhập đã tồn tại trong hệ thống. Vui lòng kiểm tra lại để tránh trùng lặp.`,
+      );
+    }
+
+    // 4. Mặc định
+    if (action === 'delete') {
+      return new BadRequestException(
+        `Chưa thể xóa ${tableTitle} do có ràng buộc dữ liệu. Vui lòng kiểm tra lại.`,
+      );
+    }
+    return new BadRequestException(
+      `Chưa thể lưu dữ liệu cho ${tableTitle}. Vui lòng kiểm tra lại các thông tin đã nhập.`,
+    );
   }
 }

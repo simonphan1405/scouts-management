@@ -1,4 +1,13 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(
+  /\/+$/,
+  "",
+);
+
+if (!API_BASE_URL && typeof window !== "undefined") {
+  console.warn(
+    "[apiClient] Biến môi trường NEXT_PUBLIC_API_URL chưa được cấu hình. Các API call có thể không thể kết nối tới backend.",
+  );
+}
 
 const TOKEN_COOKIE_NAME = "auth_token";
 
@@ -67,7 +76,10 @@ async function request<T = unknown>(
 ): Promise<T> {
   const { params, headers: customHeaders, ...rest } = options;
 
-  let url = `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+  let url =
+    endpoint.startsWith("http://") || endpoint.startsWith("https://")
+      ? endpoint
+      : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
 
   if (params) {
     const searchParams = new URLSearchParams();

@@ -146,7 +146,7 @@ const TABLE_METADATA: Record<
       { name: 'unit_type', type: 'String', nullable: true },
       {
         name: 'troop',
-        type: 'BigInt',
+        type: 'String',
         nullable: true,
         relationTo: 'troopsCollection',
       },
@@ -189,7 +189,7 @@ const TABLE_METADATA: Record<
       { name: 'identification_number', type: 'String', nullable: true },
       {
         name: 'religion',
-        type: 'BigInt',
+        type: 'String',
         nullable: true,
         relationTo: 'religionsCollection',
       },
@@ -240,7 +240,7 @@ const TABLE_METADATA: Record<
       },
       {
         name: 'ranking',
-        type: 'BigInt',
+        type: 'String',
         nullable: true,
         relationTo: 'rankingsCollection',
       },
